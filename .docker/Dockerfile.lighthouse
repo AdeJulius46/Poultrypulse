@@ -1,0 +1,23 @@
+FROM python:3.12-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY apps/backend/services/lighthouse/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install setuptools
+
+# Copy collector service code
+COPY apps/backend/services/lighthouse/src /app/src
+COPY apps/backend/services/lighthouse/.env ./
+
+# Add this line to add the current directory to PYTHONPATH
+ENV PYTHONPATH=/app:$PYTHONPATH
+
+# Expose the port the app runs on
+EXPOSE 8040

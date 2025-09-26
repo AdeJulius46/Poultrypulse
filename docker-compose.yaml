@@ -1,0 +1,315 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: lpd-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lpd_password}
+      POSTGRES_DB: ${POSTGRES_DB:-lpd_db}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres-data:/data/postgres
+      # Optional: Add initialization scripts
+      # - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - lpd-network
+    restart: always
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: lpd-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - lpd-network
+    depends_on:
+      - postgres 
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    restart: always
+
+  mq:
+    image: rabbitmq:3-management-alpine
+    container_name: lpd-rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    env_file:
+      - .env
+      - apps/backend/.env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-lpd_mq_admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-lpd_mq_admin_pass}
+    volumes:
+      - ./rabbitmq/data/:/var/lib/rabbitmq/
+      - ./rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - lpd-network 
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    restart: always
+  
+  redis:
+    image: redis:7-alpine
+    container_name: lpd-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - lpd-network
+    restart: always
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: lpd-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    expose:
+      - "6333"
+      - "6334"
+      - "6335"
+    volumes:
+      - qdrant-data:/qdrant_data
+    networks:
+      - lpd-network 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  minio:
+    image: minio/minio
+    container_name: lpd-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-lpd_minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-lpd_minio_admin_pass}
+    env_file:
+      - apps/backend/.env
+    volumes:
+      - minio_data:/data
+    networks:
+      - lpd-network 
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  api:
+    image: "lpd-api"
+    container_name: lpd-api
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.api
+    environment:
+      POSTGRES_HOST: postgres
+      RABBITMQ_HOST: mq
+    env_file:
+      - .env
+      - apps/backend/.env
+    ports:
+      - "8000:8000"  # Expose API port
+    volumes:
+      - ./apps/backend/app:/app/app
+      - ./apps/backend/alembic.ini:/app/alembic.ini
+      - ./apps/backend/alembic:/app/alembic
+      - ./apps/backend/main.py:/app/main.py
+      - ./apps/backend/scripts:/app/scripts
+      - ./apps/backend/requirements.txt:/app/requirements.txt
+    command: ["./scripts/run.sh", "--env", "dev", "--migrate"]
+    networks:
+      - lpd-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    restart: always
+
+  collector:
+    image: "lpd-collector"
+    container_name: lpd-collector
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.collector
+    environment:
+      RABBITMQ_HOST: mq
+    env_file:
+      - apps/backend/services/collector/.env
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./apps/backend/services/collector/src:/app/src
+      - ./apps/backend/services/collector/.env:/app/.env
+    networks:
+      - lpd-network 
+    command: ["python", "/app/src/main.py"]
+    depends_on:
+      - mq
+    restart: always
+
+  builder:
+    image: "lpd-builder"
+    container_name: lpd-builder
+    # platform: "linux/amd64"
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.builder
+    environment:
+      RABBITMQ_HOST: mq
+      BYTEWAX_PYTHON_FILE_PATH: "src.main:get_flow()"
+      DEBUG: "false"
+      BYTEWAX_KEEP_CONTAINER_ALIVE: "true"
+    env_file:
+      - apps/backend/services/builder/.env
+    ports:
+      - "8020:8020"
+    volumes:
+      - ./apps/backend/services/builder/src:/app/src
+      - ./apps/backend/services/builder/.env:/app/.env
+    networks:
+      - lpd-network 
+    command: ["./src/scripts/bytewax_entrypoint.sh"]
+    depends_on:
+      - mq
+      - qdrant
+    restart: always
+
+  generator:
+    image: "lpd-generator"
+    container_name: lpd-generator
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.generator
+    environment:
+      RABBITMQ_HOST: mq
+      REDIS_HOST: redis
+    env_file:
+      - apps/backend/services/generator/.env
+    ports:
+      - "8030:8030"
+    volumes:
+      - ./apps/backend/services/generator/src:/app/src
+      - ./apps/backend/services/generator/.env:/app/.env
+    networks:
+      - lpd-network
+    command: ["python", "/app/src/main.py"]
+    depends_on:
+      - mq
+      - postgres
+    restart: always
+      
+
+  lighthouse:
+    image: "lpd-lighthouse"
+    container_name: lpd-lighthouse
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.lighthouse
+    environment:
+      RABBITMQ_HOST: mq
+      REDIS_HOST: redis
+    env_file:
+      - apps/backend/services/lighthouse/.env
+    ports:
+      - "8040:8040"
+    volumes:
+      - ./apps/backend/services/lighthouse/src:/app/src
+      - ./apps/backend/services/lighthouse/.env:/app/.env
+    networks:
+      - lpd-network
+    command: ["python", "/app/src/main.py"]
+    depends_on:
+      - mq
+      - redis
+    restart: always
+
+  # frontend:
+  #   image: "lpd-frontend"
+  #   container_name: lpd-frontend
+  #   build:
+  #     context: .
+  #     dockerfile: .docker/Dockerfile.frontend
+  #   environment:
+  #     RABBITMQ_HOST: mq
+  #     REDIS_HOST: redis
+  #   env_file:
+  #     - apps/backend/.env
+  #   ports:
+  #     - "8100:8100" 
+  #   networks:
+  #     - lpd-network
+  #   depends_on:
+  #     - api
+  #     - redis
+  #   restart: always
+      
+
+networks:
+  lpd-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  pgadmin-data:
+  qdrant-data:
+  minio_data:
+  redis_data:
