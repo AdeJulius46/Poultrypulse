@@ -25,15 +25,12 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const sidebarItems = [
   { icon: LayoutGrid, href: "/dashboard", label: "Dashboard" },
-  { icon: FolderOpen, href: "/contents", label: "Contents" },
+  { icon: FolderOpen, href: "/insights", label: "Insights" },
   // { icon: Instagram, href: "/profiles", label: "Profiles" },
-  { icon: Calendar, href: "/scheduler", label: "Scheduler" },
-  { icon: Clock, href: "/history", label: "History" },
-  { icon: BarChart, href: "/analytics", label: "Analytics" },
-  { icon: Cloud, href: "/model", label: "Model" },
-  // { icon: MessageSquare, href: "/comments", label: "Comments" },
-  { icon: Settings, href: "/settings", label: "Settings" },
-  { icon: HelpCircle, href: "/signout", label: "Sign Out" },
+  { icon: Calendar, href: "/wallet", label: "Wallet" },
+  { icon: Clock, href: "/subscription", label: "Subscription" },
+  { icon: BarChart, href: "/settings", label: "Settings" },
+
 ];
 
 // const bottomItems = [
@@ -47,14 +44,14 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
   return (
     <>
       <button onClick={onToggle} className="pt-4 text-sm text-gray-600 bg-none">
-        {isOpen ? <div className="flex items-center  px-5 gap-2">
-           <Image src={"/dummylogo.svg"}   width={50} height={50} alt=""/>    <span>Loopdeck</span> 
-          </div>:  <div className=" ">   <Image src={"/dummylogo.svg"}    width={50}  height={50}  alt=""/> </div>}
+        {isOpen ? <div className="flex items-center mt-5  px-5 gap-2">
+           <Image src={"/poultry.svg"}   width={150} height={150} alt=""/> 
+          </div>:  <div className=" ">   <Image src={"/logo1.svg"}    width={50}  height={50}  alt=""/> </div>}
       </button>
 
       {isOpen && (
-        <div className=" w-full  mt-1 lg:w-[220px] ">
-          <div className={cn("w-full  lg:w-[220px]   border-r", className)}>
+        <div className=" w-full  mt-[30px] py-4   lg:w-[240px] ">
+          <div className={cn("w-full  lg:w-[240px]   border-r", className)}>
             <div className="space-y-2 py-4">
               <div className="px-6 py-4">
                 <div className="space-y-1">
@@ -66,9 +63,9 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
                         key={item.href}
                         href={item.href}
                         className={cn(
-                          "flex items-center py-4  px-4 w-[160px] text-sm font-medium rounded-[15.29px]  transition-colors",
+                          "flex items-center py-4   px-4 w-[160px] text-sm font-medium rounded-[15.29px]  transition-colors",
                           isActive
-                            ? "bg-[#5D5FEF] text-[#FFFFFF]"
+                            ? "bg-[#2E7D32] text-[#FFFFFF]"
                             : "text-[#737791]  bg-[#FFFFFF] hover:text-gray-900 hover:bg-gray-50"
                         )}
                       >

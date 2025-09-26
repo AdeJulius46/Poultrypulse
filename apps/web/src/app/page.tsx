@@ -53,7 +53,7 @@ export default function Home() {
               className="w-full"
             />
             <Button
-              onClick={() => router.push("/login")}
+              onClick={() => router.push("/register")}
               className="w-full bg-royal-blue hover:bg-primary-blue-hover text-white font-medium"
             >
               Continue →

@@ -1,66 +1,136 @@
-"use client"
+"use client";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function LoginStepper() {
   const [step, setStep] = useState(1);
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
+  const steps = [
+    { id: 1, label: "Create Account" },
+    { id: 2, label: "Verify your Email" },
+    { id: 3, label: "Register your Chicken" },
+  ];
+
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, steps.length));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 border-4 border-indigo-500  ">
-      <div className="grid w-full h-screen  grid-cols-1 border-4 border-indigo-500  gap-6 rounded-2xl bg-white p-8 shadow-lg md:grid-cols-2">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 border-4 border-indigo-500">
+      <div className="flex  w-full gap-4 h-screen grid-cols-1 rounded-2xl bg-white p-4 shadow-lg md:grid-cols-2">
         {/* Left Stepper */}
-        <div className="  w-[400px]  space-y-6 border-r p-8 rounded-md   bg-[#F2F2F2]">
-          <h1 className="text-2xl font-semibold text-green-700  mt-[30px]">Poultry Pulse</h1>
-          <div className="relative ml-4">
-            {[
-              "Create Account",
-              "Verify your Email",
-              "Login your account",
-              "Register your Chicken",
-            ].map((label, index) => {
-              const current = index + 1;
-              return (
-                <div key={label} className="relative flex items-center gap-4">
-                  {/* Circle */}
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${
-                        step >= current
-                          ? "border-green-600 bg-green-600 text-white"
-                          : "border-gray-300 text-gray-500"
-                      }`}
-                    >
-                      {current}
-                    </div>
-                    {/* Connector line */}
-                    {current < 4 && (
-                      <div
-                        className={`h-12 w-0.5 ${
-                          step > current ? "bg-green-600" : "bg-gray-300"
-                        }`}
-                      ></div>
-                    )}
+        <div className="w-[450px] space-y-6 border-r p-8 rounded-md bg-[#F2F2F2]">
+          <div className="mt-[70px] ml-8">
+            <Image src={"/poultry.svg"} width={200} height={100} alt="Logo" />
+          </div>
+
+          <div className="relative ml-4 mt-[60px]">
+            {steps.map((item, index) => (
+              <div key={item.id} className="relative flex items-center gap-4">
+                {/* Step circle + connector */}
+                <div className="flex flex-col items-center">
+                  <div>    
+                    <Image
+                      src={step >= item.id ? "/Ellipse 74.svg" : "/Ellipse2.svg"}
+                      alt="connector line"
+                      className="m-2 mx-auto h-11"
+                      width={100}
+                      height={100}
+                    />
+              
                   </div>
-                  <span
-                    className={`${
-                      step >= current ? "text-green-700 font-medium" : "text-gray-500"
-                    }`}
-                  >
-                    {label}
-                  </span>
+                  {/* Connector image (only if not last) */}
+                  {index < steps.length - 1 && (
+                    <Image
+                      src={step > item.id ? "/Vector 1.svg" : "/Vector 2.svg"}
+                      alt="connector line"
+                      className="m-2 mx-auto h-11"
+                      width={19}
+                      height={10}
+                    />
+                  )}
                 </div>
-              );
-            })}
+
+                {/* Label */}
+                <span
+                  className={`${
+                    step >= item.id
+                      ? "mt-[-30px] text-black-700 font-medium"
+                      : "mt-[-30px] text-gray-500"
+                  }`}
+                >
+                  <div className="flex flex-col ">
+                    <span >
+                    {`Step ${item.id}`}
+                    </span>
+                    <span>
+                  {item.label}
+                    </span>
+                  </div>
+                  
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Right Form */}
-        <div className="rounded-lg p-6 shadow-inner border-4 border-indigo-500 ">
+        <div className=" w-full  flex items-center rounded-lg p-6  ">
           {step === 1 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Create Account</h2>
+            <div className="space-y-4 mx-auto">
+              <h2 className="text-2xl  items-center  ml-[35%] font-semibold">Create Your  Account</h2>
+              <p className=" text-center " >
+                Let’s get you set up, your journey starts here.
+              </p>
+              <input
+                type="text"
+                placeholder="Enter your name"
+                className="w-2xl  ml-[10%]   rounded-md border px-3 py-2 focus:outline-green-600"
+              />
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-2xl ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
+              />
+              <input
+                type="password"
+                placeholder="Enter your password"
+                className="w-2xl  ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
+              />
+              <input
+                type="password"
+                placeholder="repeat your password"
+                className="w-2xl ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
+              />
+              <button
+                className="w-2xl ml-[10%]  rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                onClick={nextStep}
+              >
+              
+                 Connect  Metamask
+              </button>
+              <button
+                className="w-2xl ml-[10%]   rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                onClick={nextStep}
+              >
+                  Create account 
+              </button>
+              <p className=" flex text-center ml-[10%]   mx-auto">
+                Have an account already? 
+                <span>
+                    Login
+                </span>
+              </p>
+            </div>
+          )}
+
+          {step === 2 && (
+
+<>
+<div className="space-y-4 mx-auto">
+              <h2 className="text-2xl  items-center  ml-[35%] font-semibold">Create Your  Account</h2>
+              <p className=" text-center " >
+                Let’s get you set up, your journey starts here.
+              </p>
               <input
                 type="text"
                 placeholder="Enter your name"
@@ -76,23 +146,12 @@ export default function LoginStepper() {
                 placeholder="Enter your password"
                 className="w-full rounded-md border px-3 py-2 focus:outline-green-600"
               />
-              <button
-                className="w-full rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-                onClick={nextStep}
-              >
-                Continue
-              </button>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Verify your Email</h2>
               <input
-                type="text"
-                placeholder="Enter verification code"
+                type="repeat password"
+                placeholder="Enter your password"
                 className="w-full rounded-md border px-3 py-2 focus:outline-green-600"
               />
+
               <div className="flex justify-between gap-2">
                 <button
                   className="rounded-md border px-4 py-2 hover:bg-gray-100"
@@ -107,79 +166,69 @@ export default function LoginStepper() {
                   Verify
                 </button>
               </div>
-            </div>
-          )}
 
-          {step === 3 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Login into your Account</h2>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full rounded-md border px-3 py-2 focus:outline-green-600"
-              />
-              <input
-                type="password"
-                placeholder="Enter your password"
-                className="w-full rounded-md border px-3 py-2 focus:outline-green-600"
-              />
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4" /> Remember me
-                </label>
-                <a href="#" className="text-green-600">
-                  Forgotten Password?
-                </a>
-              </div>
               <button
                 className="w-full rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                 onClick={nextStep}
               >
-                Login
+                Continue
               </button>
-              <div className="relative my-4 text-center text-sm text-gray-500">
-                <span className="bg-white px-2">or continue with</span>
-              </div>
-              <div className="grid gap-2">
-                <button className="rounded-md border px-4 py-2 hover:bg-gray-100">
-                  Sign in with Metamask
-                </button>
-                <button className="rounded-md border px-4 py-2 hover:bg-gray-100">
-                  Sign in with Google
-                </button>
-              </div>
-              <p className="text-center text-sm">
-                Don’t have an account? <a href="#" className="text-green-600">Create an account</a>
-              </p>
             </div>
+
+
+  
+
+
+</>
+
           )}
 
-          {step === 4 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Register your Chicken</h2>
+          {step === 3 && (
+            <div className="space-y-4 mx-auto">
+              <h2 className="text-2xl  items-center  ml-[35%] font-semibold">Create Your  Account</h2>
+              <p className=" text-center " >
+                Let’s get you set up, your journey starts here.
+              </p>
               <input
                 type="text"
-                placeholder="Enter Chicken ID"
-                className="w-full rounded-md border px-3 py-2 focus:outline-green-600"
+                placeholder="Enter your name"
+                className="w-2xl  ml-[10%]   rounded-md border px-3 py-2 focus:outline-green-600"
               />
               <input
-                type="text"
-                placeholder="Enter Location"
-                className="w-full rounded-md border px-3 py-2 focus:outline-green-600"
+                type="email"
+                placeholder="Enter your email"
+                className="w-2xl ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
               />
-              <div className="flex justify-between gap-2">
+              <input
+                type="password"
+                placeholder="Enter your password"
+                className="w-2xl  ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
+              />
+              <input
+                type="password"
+                placeholder="repeat your password"
+                className="w-2xl ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
+              />
+
+
+
+                <div className="flex w-2xl  ml-[100px] justify-between gap-2">
                 <button
-                  className="rounded-md border px-4 py-2 hover:bg-gray-100"
+                  className="rounded-md border   px-4 py-2 hover:bg-gray-100"
                   onClick={prevStep}
                 >
                   Back
                 </button>
-                <button className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700">
-                  Register
+                <button
+                  className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                  onClick={nextStep}
+                >
+                  Verify
                 </button>
               </div>
-            </div>
-          )}
+
+             
+            </div>          )}
         </div>
       </div>
     </div>
