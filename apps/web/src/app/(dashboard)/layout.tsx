@@ -14,8 +14,8 @@ export default function DashboardLayout({
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   return (
-    <div className="min-h-screen  relative ">
-      <div className="bg-white shadow-lg">
+    <div className="min-h-screen bg-[#f2f2f2]  relative ">
+      <div className="shadow-lg">
       {/* <Header /> */}
       </div>
       <div className="flex ">
