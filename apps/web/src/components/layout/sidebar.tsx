@@ -43,17 +43,19 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
 
   return (
     <>
+    <div className=" h-[700px] shadow-2xl  rounded-lg  ">
+
       <button onClick={onToggle} className="pt-4 text-sm text-gray-600 bg-none">
-        {isOpen ? <div className="flex items-center mt-5  px-5 gap-2">
+        {isOpen ? <div className="flex items-center mt-[30px]  px-5 ">
            <Image src={"/poultry.svg"}   width={150} height={150} alt=""/> 
           </div>:  <div className=" ">   <Image src={"/logo1.svg"}    width={50}  height={50}  alt=""/> </div>}
       </button>
 
       {isOpen && (
-        <div className=" w-full  mt-[30px] py-4   lg:w-[240px] ">
-          <div className={cn("w-full  lg:w-[240px]   border-r", className)}>
+        <div className=" w-full  py-4   lg:w-[260px] ">
+          <div className={cn("w-full  lg:w-[260px]   border-r", className)}>
             <div className="space-y-2 py-4">
-              <div className="px-6 py-4">
+              <div className="px-6 py-2">
                 <div className="space-y-1">
                   <div></div>
                   {sidebarItems.map((item) => {
@@ -63,7 +65,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
                         key={item.href}
                         href={item.href}
                         className={cn(
-                          "flex items-center py-4   px-4 w-[160px] text-sm font-medium rounded-[15.29px]  transition-colors",
+                          "flex items-center py-4   px-4 w-[180px] text-sm font-medium rounded-[15.29px]  transition-colors",
                           isActive
                             ? "bg-[#2E7D32] text-[#FFFFFF]"
                             : "text-[#737791]  bg-[#FFFFFF] hover:text-gray-900 hover:bg-gray-50"
@@ -79,44 +81,27 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
                       </Link>
                     );
                   })}
+                  
+                
+
                 </div>
 
-                {/* 
-
-
-          <div className="space-y-1 mt-60">
-            {bottomItems.map((item) => {
-              const isActive = pathname === item.href;
-              
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center py-4 px-3 text-sm font-medium rounded-lg group transition-colors",
-                    isActive
-                    ? "bg-[#5D5FEF] text-[#FFFFFF]"
-                    : "text-[#737791]  bg-[#FFFFFF] hover:text-gray-900 hover:bg-gray-50"
-                  )}
-                >
-                  <item.icon
-                    className={cn(
-                      "h-5 w-5 mr-3 flex-shrink-0",
-                      isActive ? "text-[#FFFFFF]" : ""
-                    )}
-                  />
-                  <span className="hidden lg:block">{item.label}</span>
-                </Link>
-              );
-            })}
-          </div> */}
               </div>
             </div>
           </div>
+
+          <div className="flex items-center justify-center py-[190px]">
+         
+            <Image 
+            src={"/Group 144.svg"}
+            width={120}
+            height={100}
+            alt="image"
+            />
+          </div>
         </div>
       )}
-
-
+ </div>
     </>
   );
 }

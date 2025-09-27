@@ -18,16 +18,16 @@ export default function DashboardLayout({
       <div className="bg-white shadow-lg">
       {/* <Header /> */}
       </div>
-      <div className="flex">
-      <div className="absolute top-0 left-0 z-30 mt-4 rounded-lg  ">
-        <div className={`${sidebarOpen? "h-screen bg-white shadow-lg  fixed":""}`}
+      <div className="flex ">
+      <div className=" rounded-lg shadow-xl  absolute  top-0 left-4  mt-4   ">
+        <div className={`${sidebarOpen? "  fixed":""}`}
         
         >
           <Sidebar   isOpen={sidebarOpen} onToggle={toggleSidebar} />
         </div>
         </div>
         <main   className={`flex-1 p-6 transition-all duration-300  overflow-y h-screen ${
-            sidebarOpen ? "ml-0 lg:ml-[280px]" : "ml-0 lg:ml-[24px]"
+            sidebarOpen ? "ml-0 lg:ml-[290px] " : "ml-0 lg:ml-[64px]"
           }`}>
           {children}
         </main>
