@@ -213,6 +213,7 @@ export const RecommendationsSection = () => {
       <div className="ml-[21px] w-[255px] h-[27px] mt-[13px] font-paragraph-large-regular font-[number:var(--paragraph-large-regular-font-weight)] text-[#102311] text-[length:var(--paragraph-large-regular-font-size)] tracking-[var(--paragraph-large-regular-letter-spacing)] leading-[var(--paragraph-large-regular-line-height)] [font-style:var(--paragraph-large-regular-font-style)]">
         AI Predictions from Live Feed
       </div>
+  
 
       {/* Predictions Section */}
       <div className="flex ml-[21px] w-[377px] relative mt-1.5 flex-col items-start gap-[7px]">
@@ -291,13 +292,18 @@ export const RecommendationsSection = () => {
                         <h4 className="[font-family:'Gilroy-Medium-Medium',Helvetica] font-medium text-[#18341a] text-xs tracking-[-0.2px]">
                           {getDiseaseDisplayName(detection.disease)}
                         </h4>
-                        <div className={`px-2 py-1 rounded-full text-[8px] font-medium ${
-                          detection.risk_level === 'CRITICAL' ? 'bg-red-100 text-red-800' :
-                          detection.risk_level === 'HIGH' ? 'bg-orange-100 text-orange-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {detection.risk_level}
-                        </div>
+                       <div
+  className={`px-2 py-1 rounded-full text-[8px] font-medium ${
+    detection.risk_level === 'CRITICAL'
+      ? 'bg-red-100 text-red-800'
+      : detection.risk_level === 'HIGH'
+      ? 'bg-orange-100 text-orange-800'
+      : 'bg-yellow-100 text-yellow-800'
+  }`}
+>
+  {detection.risk_level}
+</div>
+
                       </div>
                       
                       <div className="flex items-center gap-2 text-[8px] text-gray-600">
@@ -331,20 +337,23 @@ export const RecommendationsSection = () => {
         <BotIcon className="relative w-6 h-6" />
       </div>
 
-      <Card className="ml-[21px] w-[377px] min-h-28 mt-2.5 bg-[#e8f5e9] rounded-xl border-none shadow-none overflow-hidden mb-4">
+      <Card className="ml-[21px] w-[377px] h-28 mt-2.5 bg-[#e8f5e9] rounded-xl border-none shadow-none overflow-hidden m-4 px-2">
         <CardContent className="p-0 h-full">
-          <div className="mt-[9px] w-[350px] ml-3 [font-family:'Poppins',Helvetica] font-normal text-[#18341a] text-[10px] tracking-[-0.20px] leading-[19px]">
-            <span className="font-light tracking-[-0.02px]">
-              {recommendations.slice(0, 6).map((rec, index) => (
-                <React.Fragment key={index}>
-                  {rec}
-                  {index < recommendations.slice(0, 6).length - 1 && <br />}
-                </React.Fragment>
-              ))}
+          <div className="mt-[9px] w-[292px] h-[95px] ml-1.5 x-2 [font-family:'Poppins',Helvetica] font-normal text-[#18341a] text-[10px] tracking-[-0.20px] leading-[19px]">
+            <span className="font-light tracking-[-0.02px] ">
+              Increase airflow in the poultry house to reduce heat stress.
+              <br />
+              Add electrolytes or vitamins to water to support recovery.
+              <br />
+              Provide cool, clean drinking water to prevent dehydration.
+              <br />
+              Disinfect water lines to prevent bacterial growth.
+              <br />
+              Clean and dry litter to minimize moisture buildup.
             </span>
           </div>
         </CardContent>
       </Card>
     </div>
   );
-};
+}
