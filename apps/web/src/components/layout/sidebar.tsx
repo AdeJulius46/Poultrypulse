@@ -43,7 +43,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
 
   return (
     <>
-    <div className=" h-[700px] shadow-2xl  rounded-lg  ">
+    <div className=" h-[700px] shadow-2xl  rounded-lg   bg-white ">
 
       <button onClick={onToggle} className="pt-4 text-sm text-gray-600 bg-none">
         {isOpen ? <div className="flex items-center mt-[30px]  px-5 ">
