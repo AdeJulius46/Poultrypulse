@@ -29,7 +29,7 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
       label: "Batch A",
       isActive: true,
       icon: "/cbi-chicken.svg",
-      streamUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4", // Poultry farm video
+      streamUrl: "vid1.mp4", // Poultry farm video
       isLiveStream: false
     },
     {
@@ -45,7 +45,7 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
       label: "Batch C", 
       isActive: false,
       icon: "/cbi-chicken.svg",
-      streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Another poultry farm video
+      streamUrl: "vid2.mp4", // Another poultry farm video
       isLiveStream: false
     },
   ];
