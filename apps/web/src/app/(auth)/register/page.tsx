@@ -2,6 +2,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Connector, useConnect } from "wagmi";
+import { WalletOptions } from "./wallet";
 
 
 export default function LoginStepper() {
@@ -109,8 +111,9 @@ export default function LoginStepper() {
                 onClick={nextStep}
               >
               
-                 Connect  Metamask
+                  <WalletOptions />
               </button>
+             
               <button
                 className="w-2xl ml-[10%]   rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                 onClick={nextStep}
