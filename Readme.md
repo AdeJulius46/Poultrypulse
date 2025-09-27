@@ -124,7 +124,7 @@ PoultryPulse bridges the gap between **on-farm AI predictions** and **trustworth
 
 ---
 
-## 📦 Components
+## �� Components
 
 ### **1. Raspberry Pi (Edge Device)**
 
@@ -191,7 +191,7 @@ create table public.events (
 ## 🌐 Live Demo & Links
 
 * **Web App (Vercel)**: [👉 View Here](https://your-vercel-link.com)
-* **Demo Video**: [🎥 Watch Here](https://your-demo-video-link.com)
+* **Demo Video**: [�� Watch Here](https://your-demo-video-link.com)
 * **Smart Contract Repo**: [🔗 Contract Code](https://github.com/your-repo-link)
 
 ---
