@@ -1,8 +1,11 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 
 export default function LoginStepper() {
+    const router = useRouter();
   const [step, setStep] = useState(1);
 
   const steps = [
@@ -221,7 +224,7 @@ export default function LoginStepper() {
                 </button>
                 <button
                   className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-                  onClick={nextStep}
+                onClick={() => router.push("/dashboard")}
                 >
                   Verify
                 </button>
