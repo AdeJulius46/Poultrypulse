@@ -69,10 +69,14 @@ export const Details = () => {
   }, [isRewardActive, localRewardPoints]);
 
   console.log("Balance error:", balanceError);
+  console.log(address);
+  
 
 
   const addPoints = () => {
     try {
+      console.log("Adding points...");
+      
       const pointsToConvert = localRewardPoints || 0;
       if (pointsToConvert <= 0) {
         alert("No reward points available to convert");

@@ -106,16 +106,13 @@ export default function LoginStepper() {
                 placeholder="repeat your password"
                 className="w-2xl ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
               />
-              <button
-                className="w-2xl ml-[10%]  rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-                onClick={nextStep}
-              >
+          
               
                   <WalletOptions />
-              </button>
+             
              
               <button
-                className="w-2xl ml-[10%]   rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                className="w-2xl ml-[10%] rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                 onClick={nextStep}
               >
                   Create account 
