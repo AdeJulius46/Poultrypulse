@@ -47,11 +47,11 @@ export default function Home() {
 
           {/* Form */}
           <div className="space-y-4">
-            <Input
+            {/* <Input
               type="email"
               placeholder="Email Address"
               className="w-full"
-            />
+            /> */}
             <Button
               onClick={() => router.push("/register")}
               className="w-full bg-[#3EA843]  hover:bg-primary-blue-hover text-white font-medium"
