@@ -92,10 +92,10 @@ export const RecommendationsSection = () => {
         <BotIcon className="relative w-6 h-6" />
       </div>
 
-      <Card className="ml-[21px] w-[377px] h-28 mt-2.5 bg-[#e8f5e9] rounded-xl border-none shadow-none overflow-hidden">
+      <Card className="ml-[21px] w-[377px] h-28 mt-2.5 bg-[#e8f5e9] rounded-xl border-none shadow-none overflow-hidden m-4 px-2">
         <CardContent className="p-0 h-full">
-          <div className="mt-[9px] w-[292px] h-[95px] ml-1.5 [font-family:'Poppins',Helvetica] font-normal text-[#18341a] text-[10px] tracking-[-0.20px] leading-[19px]">
-            <span className="font-light tracking-[-0.02px]">
+          <div className="mt-[9px] w-[292px] h-[95px] ml-1.5 x-2 [font-family:'Poppins',Helvetica] font-normal text-[#18341a] text-[10px] tracking-[-0.20px] leading-[19px]">
+            <span className="font-light tracking-[-0.02px] ">
               Increase airflow in the poultry house to reduce heat stress.
               <br />
               Add electrolytes or vitamins to water to support recovery.

@@ -2,6 +2,7 @@ import { Details } from "./details/page";
 import { ActionButtonsSection } from "./ActionButtonsSection.tsx/page";
 import { PredictionsSection } from "./PredictionsSection .tsx/page";
 import { RecommendationsSection } from "./RecommendationsSection.tsx/page";
+// import { LiveFeedSection } from "./LiveFeedSection.tsx/page";
 // import {Recom}
 // import Recomm
 // import { PredictionsSection } from "./PredictionsSection. tsx/page";
@@ -25,7 +26,7 @@ export default function DashboardPage()
           <RecommendationsSection />
         </div>
 
-        <div className="col-span-9 col-start-4">
+        <div className="col-span-9 ">
           {/* <LiveFeedSection /> */}
         </div>
       </div>
