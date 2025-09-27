@@ -25,7 +25,7 @@ export const Details = () => {
   ];
 
   return (
-    <Card className="w-[700px ] bg-white rounded-3xl border-0 shadow-none">
+    <Card className="w-[600px] bg-white rounded-3xl border-0 shadow-none">
       <CardContent className="p-6 relative h-[218px]">
         <header className="flex items-end justify-between mb-8">
           <div className="flex items-end gap-5">
