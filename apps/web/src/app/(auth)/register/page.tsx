@@ -195,12 +195,12 @@ export default function LoginStepper() {
                 className="w-2xl ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
               />
               <input
-                type="password"
+                type="text"
                 placeholder="Breed Type"
                 className="w-2xl  ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
               />
               <input
-                type="Number of Chickens"
+                type="password"
                 placeholder="repeat your password"
                 className="w-2xl ml-[10%]  rounded-md border px-3 py-2 focus:outline-green-600"
               />

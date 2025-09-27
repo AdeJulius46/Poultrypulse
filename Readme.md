@@ -192,7 +192,7 @@ create table public.events (
 
 * **Web App (Vercel)**: [👉 View Here](https://your-vercel-link.com)
 * **Demo Video**: [�� Watch Here](https://your-demo-video-link.com)
-* **Smart Contract Repo**: [🔗 Contract Code](https://github.com/your-repo-link)
+* **Pitch Deck**: [🔗 pitch deck](https://www.canva.com/design/DAG0KAFijBQ/Yv9dFHciWcHiu60c9bLFXg/view?utlId=hc57643978d#4)
 
 ---
 
