@@ -1,19 +1,28 @@
+"use client"
 import { BellIcon } from "lucide-react";
 import React from "react";
 import { Avatar, AvatarImage } from "../../../../components/ui/avatar";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
+import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
 
 export const PredictionsSection = () => {
+  const { address } = useAccount()
+  const truncateAddress = (_address_: any, startLength = 6, endLength = 4) => {
+  if (!address) return '';
+  if (address.length <= startLength + endLength) return address;
+  
+  return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
+};
   return (
-    <div className="w-full flex items-center justify-center bg-white rounded-[50px] overflow-hidden p-1.5">
+    <div className="w-full flex items-center justify-around bg-white rounded-[50px] overflow-hidden p-1.5">
       <div className="flex h-[42px] w-full max-w-[448px] items-center justify-between gap-[26px]">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center justify-between gap-1">
           <Button className="h-[42px] w-[158px] px-8 py-3.5 rounded-[50px] bg-gradient-to-r from-[#36923b] to-[#27ae2e] hover:from-[#2e7d32] hover:to-[#1b5e20] text-white font-bold text-lg [font-family:'Afacad',Helvetica] leading-6">
             + Add New Batch
           </Button>
 
-          <Button
+        {address ? <>{truncateAddress(address)}</> :   <Button
             variant="outline"
             className="h-[42px] w-[184px] px-8 py-3.5 bg-[#f2f2f2] rounded-[50px] border border-[#3ea843] hover:bg-[#e8f5e8] text-[#2e7d32] font-bold text-lg [font-family:'Afacad',Helvetica] leading-6 gap-3"
           >
@@ -22,8 +31,9 @@ export const PredictionsSection = () => {
               alt="Token branded"
               src="/token-branded-metamask.svg"
             />
-            Connect Wallet
-          </Button>
+            {/* {address ? ""} */}
+            connect
+          </Button>}
         </div>
 
         <div className="flex items-center gap-1.5">
