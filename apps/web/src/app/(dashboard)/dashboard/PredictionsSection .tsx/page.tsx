@@ -1,12 +1,13 @@
 "use client"
 import { BellIcon } from "lucide-react";
-import React from "react";
 import { Avatar, AvatarImage } from "../../../../components/ui/avatar";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
+import React, { useState } from "react";
 
 export const PredictionsSection = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const { address } = useAccount()
   const truncateAddress = (_address_: any, startLength = 6, endLength = 4) => {
   if (!address) return '';
@@ -18,9 +19,73 @@ export const PredictionsSection = () => {
     <div className="w-full flex items-center justify-around bg-white rounded-[50px] overflow-hidden p-1.5">
       <div className="flex h-[42px] w-full max-w-[448px] items-center justify-between gap-[26px]">
         <div className="flex items-center justify-between gap-1">
-          <Button className="h-[42px] w-[158px] px-8 py-3.5 rounded-[50px] bg-gradient-to-r from-[#36923b] to-[#27ae2e] hover:from-[#2e7d32] hover:to-[#1b5e20] text-white font-bold text-lg [font-family:'Afacad',Helvetica] leading-6">
-            + Add New Batch
-          </Button>
+           <button
+          onClick={() => setIsOpen(true)}
+          className="h-[42px] w-[158px] px-8 py-3.5 rounded-[50px] bg-gradient-to-r from-[#36923b] to-[#27ae2e] hover:from-[#2e7d32] hover:to-[#1b5e20] text-white font-bold text-lg [font-family:'Afacad',Helvetica] leading-6"
+        >
+          + Add New Batch
+        </button>
+
+        {/* Modal */}
+        {isOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-50">
+            <div className="bg-white rounded-2xl shadow-lg w-[400px] p-6 relative">
+              {/* Verify Button (Closes Popup) */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="absolute top-3 right-3 bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded-lg text-sm font-semibold"
+              >
+                Add batch
+              </button>
+
+              {/* Modal Content */}
+              <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
+                Add New Batch
+              </h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Farm Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter farm name"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Batch Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter batch name"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Breed Type
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter breed type"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+            
+
+
+
+
+
 
         {address ? <>{truncateAddress(address)}</> :   <Button
             variant="outline"
