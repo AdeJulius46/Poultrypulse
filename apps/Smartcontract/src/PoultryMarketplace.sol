@@ -20,7 +20,6 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         keccak256("VERIFIED_FARMER_ROLE");
     bytes32 public constant VET_OFFICER_ROLE = keccak256("VET_OFFICER_ROLE");
     bytes32 public constant ARBITRATOR_ROLE = keccak256("ARBITRATOR_ROLE");
-    
 
     // ========= ENUMS =========
     enum ProductType {
@@ -199,7 +198,12 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
     // ========== CONSTRUCTOR & INITIALIZER ==========
 
     ///@custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _feeCollector, uint256 _platformFeePercent, address _pulseToken, address _owner) {
+    constructor(
+        address _feeCollector,
+        uint256 _platformFeePercent,
+        address _pulseToken,
+        address _owner
+    ) {
         require(_feeCollector != address(0), "Invalid fee collector");
         require(_platformFeePercent <= 1000, "Fee too high"); // Max 10%
 
@@ -385,13 +389,19 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         require(listing.status == ListingStatus.Active, "Listing not active");
         require(block.timestamp < listing.expiresAt, "Listing expired");
         require(_quantity >= listing.minimumOrder, "Below minimum order");
-        require(_quantity <= listing.availableQuantity, "Insufficine quantity");
+        require(
+            _quantity <= listing.availableQuantity,
+            "Insufficient quantity"
+        );
 
         uint totalPrice = _quantity * listing.pricePerUnit;
         uint platformFee = (totalPrice + platformFeePercent) / 10000;
         uint totalRequired = totalPrice + platformFee;
 
-        require(pulseToken.balanceOf(msg.sender) >= totalRequired, "Insufficient payment");
+        require(
+            pulseToken.balanceOf(msg.sender) >= totalRequired,
+            "Insufficient payment"
+        );
 
         uint256 orderId = orderCounter++;
 
@@ -431,7 +441,7 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
             totalPrice
         );
         emit PaymentEscrowed(orderId, totalRequired);
-        
+
         pulseToken.transferFrom(msg.sender, feeCollector, totalRequired);
         // Refund excess payment
         // if (msg.value > totalRequired) {

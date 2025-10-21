@@ -21,7 +21,7 @@ contract PoultryMarketplaceTest is Test {
 
     uint256 quantity = 40;
     uint256 pricePerUnit = 3000;
-    uint256 minimumOrder = 2;
+    uint256 minimumOrder = 3;
     bytes32 healthCerHash = "0x325";
     bytes32 iotDataHash = "0x345";
     string farmLocation = "Lagos";
@@ -244,5 +244,27 @@ contract PoultryMarketplaceTest is Test {
         vm.prank(buyer1);
         vm.expectRevert("Listing not active");
         poultrypulseMarketplace.placeOrder(listingId, order_quantity);
+    }
+
+    function test_place_order_to_fail_status_expired() public _createListing {
+        vm.warp(durationDays * 2 days);
+        vm.prank(buyer1);
+        vm.expectRevert("Listing expired");
+        poultrypulseMarketplace.placeOrder(listingId, order_quantity);
+    }
+
+    function test_place_order_to_fail_below_minimum() public _createListing {
+        vm.prank(buyer1);
+        vm.expectRevert("Below minimum order");
+        poultrypulseMarketplace.placeOrder(listingId, 0);
+    }
+
+    function test_place_order_to_fail_insufficient_quantity()
+        public
+        _createListing
+    {
+        vm.prank(buyer1);
+        vm.expectRevert("Insufficient quantity");
+        poultrypulseMarketplace.placeOrder(listingId, 10000);
     }
 }
