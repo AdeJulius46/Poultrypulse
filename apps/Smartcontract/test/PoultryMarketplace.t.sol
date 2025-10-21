@@ -10,6 +10,7 @@ import {PoultryPulse} from "../src/poultryPulse.sol";
 contract PoultryMarketplaceTest is Test {
     PoultryMarketplace public poultrypulseMarketplace;
     PoultryPulse public poultryPulse;
+    Token public pulseToken;
     address owner = makeAddr("Owner");
 
     address farmer1 = makeAddr("Farmer-1");
@@ -26,9 +27,15 @@ contract PoultryMarketplaceTest is Test {
     string farmLocation = "Lagos";
     uint256 durationDays = 30;
 
+    uint256 amount_to_mint = 1_000_000_000;
+
     // Mock State Value
     address feeCollector = makeAddr("feeCollector");
     uint platformFeePercent = 20; // Representing 0.2 as 20 (20% / 100)
+    bytes32 constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+
+    uint256 listingId = 1;
+    uint256 order_quantity = 10;
 
     // ===== ENUMS =====
     enum ProductType {
@@ -58,11 +65,22 @@ contract PoultryMarketplaceTest is Test {
         uint256 newQuantity
     );
 
+    event OrderPlaced(
+        uint256 indexed orderId,
+        uint256 indexed listingId,
+        address indexed buyer,
+        uint256 quantity,
+        uint256 totalPrice
+    );
+
     function setUp() public {
         // Deploy contracts
+        pulseToken = new Token();
         poultrypulseMarketplace = new PoultryMarketplace(
             feeCollector,
-            platformFeePercent
+            platformFeePercent,
+            address(pulseToken),
+            owner
         );
         poultrypulseMarketplace.verifyFarmer(farmer1);
         poultrypulseMarketplace.verifyFarmer(farmer2);
@@ -190,5 +208,41 @@ contract PoultryMarketplaceTest is Test {
         vm.expectRevert("Not listing owner");
         poultrypulseMarketplace.cancelListing(1);
         vm.stopPrank();
+    }
+
+    // function() test_markInTransit() public {}
+    // function() test_confirmOrder() publuc {}
+
+    function test_place_order() public _createListing {
+        vm.startPrank(buyer1);
+
+        pulseToken.mint(buyer1, amount_to_mint);
+        uint256 totalPrice = pricePerUnit * order_quantity;
+        pulseToken.approve(address(poultrypulseMarketplace), amount_to_mint);
+        vm.expectEmit(true, true, true, true);
+        emit OrderPlaced(1, listingId, buyer1, order_quantity, totalPrice);
+        uint256 orderId_before = poultrypulseMarketplace.orderCounter();
+        uint256 orderId = poultrypulseMarketplace.placeOrder(
+            listingId,
+            order_quantity
+        );
+        uint256 orderId_after = poultrypulseMarketplace.orderCounter();
+
+        assertEq(orderId_before, orderId);
+        assert(orderId_after != orderId_before);
+
+        vm.stopPrank();
+    }
+
+    function test_place_order_to_fail_status_change() public _createListing {
+        vm.prank(owner);
+        poultrypulseMarketplace.changeStatus(
+            listingId,
+            PoultryMarketplace.ListingStatus.Suspended
+        );
+
+        vm.prank(buyer1);
+        vm.expectRevert("Listing not active");
+        poultrypulseMarketplace.placeOrder(listingId, order_quantity);
     }
 }

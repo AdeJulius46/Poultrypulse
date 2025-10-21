@@ -4,6 +4,8 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
+import "@openzeppelin/contracts/interfaces/IERC20.sol";
+import {Token} from "./poultryPulseToken.sol";
 
 /**
  * @title Poultry Marketplace
@@ -18,6 +20,7 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         keccak256("VERIFIED_FARMER_ROLE");
     bytes32 public constant VET_OFFICER_ROLE = keccak256("VET_OFFICER_ROLE");
     bytes32 public constant ARBITRATOR_ROLE = keccak256("ARBITRATOR_ROLE");
+    
 
     // ========= ENUMS =========
     enum ProductType {
@@ -114,6 +117,7 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
     }
 
     // ========== STATE VARIABLES ==========
+    Token public pulseToken;
 
     uint256 public listingCounter;
     uint256 public orderCounter;
@@ -195,13 +199,15 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
     // ========== CONSTRUCTOR & INITIALIZER ==========
 
     ///@custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _feeCollector, uint256 _platformFeePercent) {
+    constructor(address _feeCollector, uint256 _platformFeePercent, address _pulseToken, address _owner) {
         require(_feeCollector != address(0), "Invalid fee collector");
         require(_platformFeePercent <= 1000, "Fee too high"); // Max 10%
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ADMIN_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, _owner);
 
+        pulseToken = Token(_pulseToken);
         feeCollector = _feeCollector;
         platformFeePercent = _platformFeePercent;
         listingCounter = 1;
@@ -385,7 +391,7 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         uint platformFee = (totalPrice + platformFeePercent) / 10000;
         uint totalRequired = totalPrice + platformFee;
 
-        require(msg.value >= totalRequired, "Insufficient payment");
+        require(pulseToken.balanceOf(msg.sender) >= totalRequired, "Insufficient payment");
 
         uint256 orderId = orderCounter++;
 
@@ -425,14 +431,15 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
             totalPrice
         );
         emit PaymentEscrowed(orderId, totalRequired);
-
+        
+        pulseToken.transferFrom(msg.sender, feeCollector, totalRequired);
         // Refund excess payment
-        if (msg.value > totalRequired) {
-            (bool success, ) = msg.sender.call{
-                value: msg.value - totalRequired
-            }("");
-            require(success, "Refund failed");
-        }
+        // if (msg.value > totalRequired) {
+        //     (bool success, ) = msg.sender.call{
+        //         value: msg.value - totalRequired
+        //     }("");
+        //     require(success, "Refund failed");
+        // }
 
         return orderId;
     }
