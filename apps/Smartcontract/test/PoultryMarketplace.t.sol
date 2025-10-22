@@ -20,14 +20,16 @@ contract PoultryMarketplaceTest is Test {
     address buyer2 = makeAddr("Buyer-2");
 
     uint256 quantity = 40;
-    uint256 pricePerUnit = 3000;
+    uint256 pricePerUnit = 3000e18;
     uint256 minimumOrder = 3;
     bytes32 healthCerHash = "0x325";
     bytes32 iotDataHash = "0x345";
     string farmLocation = "Lagos";
     uint256 durationDays = 30;
+    bytes32 deliverProofHash = "0x345";
+    uint256 orderId = 1;
 
-    uint256 amount_to_mint = 1_000_000_000;
+    uint256 amount_to_mint = 1_000_000_000e18;
 
     // Mock State Value
     address feeCollector = makeAddr("feeCollector");
@@ -73,6 +75,18 @@ contract PoultryMarketplaceTest is Test {
         uint256 totalPrice
     );
 
+    event OrderStatusChanged(
+        uint256 indexed orderId,
+        PoultryMarketplace.OrderStatus newStatus
+    );
+
+    event PaymentReleased(
+        uint256 indexed orderId,
+        address indexed farmer,
+        uint256 indexed amount,
+        uint256 platformFee
+    );
+
     function setUp() public {
         // Deploy contracts
         pulseToken = new Token();
@@ -88,7 +102,7 @@ contract PoultryMarketplaceTest is Test {
 
     modifier _createListing() {
         vm.startPrank(farmer1);
-        uint256 listingId = poultrypulseMarketplace.createListing(
+        poultrypulseMarketplace.createListing(
             PoultryMarketplace.ProductType.Broiler,
             quantity,
             pricePerUnit,
@@ -98,6 +112,24 @@ contract PoultryMarketplaceTest is Test {
             farmLocation,
             durationDays
         );
+        vm.stopPrank();
+        _;
+    }
+
+    modifier _placeOrder() {
+        vm.startPrank(buyer1);
+        pulseToken.mint(buyer1, amount_to_mint);
+        uint256 totalPrice = pricePerUnit * order_quantity;
+        pulseToken.approve(address(poultrypulseMarketplace), amount_to_mint);
+        poultrypulseMarketplace.placeOrder(listingId, order_quantity);
+        vm.stopPrank();
+        _;
+    }
+
+    modifier _confirmOrder_markInTransit() {
+        vm.startPrank(farmer1);
+        poultrypulseMarketplace.confirmOrder(orderId);
+        poultrypulseMarketplace.markInTransit(orderId);
         vm.stopPrank();
         _;
     }
@@ -116,7 +148,7 @@ contract PoultryMarketplaceTest is Test {
             quantity,
             pricePerUnit
         );
-        uint256 listingId = poultrypulseMarketplace.createListing(
+        poultrypulseMarketplace.createListing(
             PoultryMarketplace.ProductType.Broiler,
             quantity,
             pricePerUnit,
@@ -210,7 +242,7 @@ contract PoultryMarketplaceTest is Test {
         vm.stopPrank();
     }
 
-    // function() test_markInTransit() public {}
+    // function() test_confirmOrder_markInTransit() public {}
     // function() test_confirmOrder() publuc {}
 
     function test_place_order() public _createListing {
@@ -222,10 +254,7 @@ contract PoultryMarketplaceTest is Test {
         vm.expectEmit(true, true, true, true);
         emit OrderPlaced(1, listingId, buyer1, order_quantity, totalPrice);
         uint256 orderId_before = poultrypulseMarketplace.orderCounter();
-        uint256 orderId = poultrypulseMarketplace.placeOrder(
-            listingId,
-            order_quantity
-        );
+        poultrypulseMarketplace.placeOrder(listingId, order_quantity);
         uint256 orderId_after = poultrypulseMarketplace.orderCounter();
 
         assertEq(orderId_before, orderId);
@@ -266,5 +295,88 @@ contract PoultryMarketplaceTest is Test {
         vm.prank(buyer1);
         vm.expectRevert("Insufficient quantity");
         poultrypulseMarketplace.placeOrder(listingId, 10000);
+    }
+
+    function test_confirm_order()
+        public
+        _createListing
+        _placeOrder
+        _confirmOrder_markInTransit
+    {
+        vm.prank(feeCollector);
+        pulseToken.approve(address(poultrypulseMarketplace), amount_to_mint);
+
+        vm.startPrank(buyer1);
+        uint256 feeCollector_balance_before = pulseToken.balanceOf(
+            address(feeCollector)
+        );
+        console.log("Fee collector Balance", feeCollector_balance_before);
+        uint256 totalPrice = pricePerUnit * order_quantity;
+        vm.expectEmit(true, true, false, false);
+        emit OrderStatusChanged(1, PoultryMarketplace.OrderStatus.Delivered);
+        emit PaymentReleased(1, buyer1, totalPrice, 3e18);
+        emit OrderStatusChanged(
+            orderId,
+            PoultryMarketplace.OrderStatus.Completed
+        );
+        poultrypulseMarketplace.confirmDelivery(1, deliverProofHash);
+        vm.stopPrank();
+        uint256 feeCollector_balance_after = pulseToken.balanceOf(
+            address(feeCollector)
+        );
+        assert(feeCollector_balance_before > feeCollector_balance_after);
+        assertEq(pulseToken.balanceOf(address(farmer1)), totalPrice);
+    }
+
+    function test_confirm_delivery_fail()
+        public
+        _createListing
+        _placeOrder
+        _confirmOrder_markInTransit
+    {
+        vm.prank(buyer2);
+        vm.expectRevert("Not order buyer");
+        poultrypulseMarketplace.confirmDelivery(orderId, deliverProofHash);
+    }
+
+    function test_confirm_delivery_fail_order_not_in_transit()
+        public
+        _createListing
+        _placeOrder
+    {
+        vm.prank(farmer1);
+        poultrypulseMarketplace.confirmOrder(orderId);
+        vm.expectRevert("Order not in transit");
+        vm.prank(buyer1);
+        poultrypulseMarketplace.confirmDelivery(orderId, deliverProofHash);
+    }
+
+    // ========== ADMIN FUNCTIONS TEST ==========
+
+    function test_updatePlatformFee() public {
+        vm.prank(owner);
+        uint256 _newFeePercent = 30;
+        poultrypulseMarketplace.updatePlatformFee(_newFeePercent);
+        assertEq(_newFeePercent, poultrypulseMarketplace.platformFeePercent());
+    }
+
+    function test_updatePlatformfee_fail() public {
+        vm.prank(owner);
+        uint256 _newFeePercent = 1500;
+        vm.expectRevert("Fee to high");
+        poultrypulseMarketplace.updatePlatformFee(_newFeePercent);
+    }
+
+    function test_updateFee_colleactor() public {
+        vm.prank(owner);
+        address newFeeCollector = makeAddr("new_fee_collector");
+        poultrypulseMarketplace.updateFeeCollector(newFeeCollector);
+        assertEq(newFeeCollector, poultrypulseMarketplace.feeCollector());
+    }
+
+    function test_updateFee_colleactor_fail() public {
+        vm.prank(owner);
+        vm.expectRevert();
+        poultrypulseMarketplace.updateFeeCollector(address(0)); 
     }
 }

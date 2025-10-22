@@ -177,7 +177,7 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
     event PaymentReleased(
         uint256 indexed orderId,
         address indexed farmer,
-        uint256 amount,
+        uint256 indexed amount,
         uint256 platformFee
     );
 
@@ -395,7 +395,7 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         );
 
         uint totalPrice = _quantity * listing.pricePerUnit;
-        uint platformFee = (totalPrice + platformFeePercent) / 10000;
+        uint platformFee = (totalPrice * platformFeePercent) / 10000;
         uint totalRequired = totalPrice + platformFee;
 
         require(
@@ -442,7 +442,7 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         );
         emit PaymentEscrowed(orderId, totalRequired);
 
-        pulseToken.transferFrom(msg.sender, feeCollector, totalRequired);
+        pulseToken.transferFrom(msg.sender, address(this), totalRequired);
         // Refund excess payment
         // if (msg.value > totalRequired) {
         //     (bool success, ) = msg.sender.call{
@@ -454,13 +454,137 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         return orderId;
     }
 
-    // ============= ADMIN FUNCTIONS ==========
+    /**
+     * @notice Confirm delivery and release payment
+     */
 
-    function verifyFarmer(address _farmer) external onlyRole(ADMIN_ROLE) {
-        grantRole(VERIFIED_FARMER_ROLE, _farmer);
-        farmerStats[_farmer].isActive = true;
-        emit FarmerVerified(_farmer, block.timestamp);
+    function confirmDelivery(
+        uint256 _orderId,
+        bytes32 _deliveryProofHash
+    ) external nonReentrant {
+        Order storage order = orders[_orderId];
+        require(order.buyer == msg.sender, "Not order buyer");
+        require(order.status == OrderStatus.InTransit, "Order not in transit");
+
+        order.status = OrderStatus.Delivered;
+        order.deliveredAt = block.timestamp;
+        order.deliveryProofHash = _deliveryProofHash;
+
+        emit OrderStatusChanged(_orderId, OrderStatus.Delivered);
+
+        // Release payment
+        _releasePayment(_orderId);
     }
+
+    /**
+     * @notice Raise a dispute for an order
+     */
+
+    function raiseDispute(
+        uint256 _orderId,
+        string memory _reason,
+        bytes32 _evidenceHash
+    ) external {
+        Order storage order = orders[_orderId];
+        require(
+            order.buyer == msg.sender || order.farmer == msg.sender,
+            "Not order participant"
+        );
+
+        require(
+            order.status != OrderStatus.Completed &&
+                order.status != OrderStatus.Cancelled &&
+                order.status != OrderStatus.Refunded,
+            "Order finalized"
+        );
+        require(
+            order.disputeStatus == DisputeStatus.None,
+            "Dispute already raised"
+        );
+
+        order.status = OrderStatus.Disputed;
+        order.disputeStatus = DisputeStatus.Raised;
+
+        disputes[_orderId] = Dispute({
+            orderId: _orderId,
+            initiator: msg.sender,
+            reason: _reason,
+            evidenceHash: _evidenceHash,
+            createdAt: block.timestamp,
+            status: DisputeStatus.Raised,
+            arbitrator: address(0),
+            resolution: ""
+        });
+
+        emit DisputeRaised(_orderId, msg.sender, _reason);
+    }
+
+    // ============ INTERNAL FUNCTIONS ===========
+    /**
+     * @notice Release escrowed payment to farmer
+     */
+    function _releasePayment(uint256 _orderId) internal {
+        Order storage order = orders[_orderId];
+        uint256 escrowAmount = orderEscrow[_orderId];
+
+        require(escrowAmount > 0, "No escrow balance");
+
+        orderEscrow[_orderId] = 0;
+        order.status = OrderStatus.Completed;
+
+        // Transfer to farmer
+        uint256 farmerAmount = order.totalPrice;
+        // pulseToken.transfer(order.farmer, farmerAmount);
+        pulseToken.transfer(order.farmer, farmerAmount);
+
+        // Update Stats
+        farmerStats[order.farmer].totalSales++;
+        farmerStats[order.farmer].totalRevenue += farmerAmount;
+        farmerStats[order.farmer].successfulDeliveries++;
+
+        emit PaymentReleased(
+            _orderId,
+            order.farmer,
+            farmerAmount,
+            order.platformFee
+        );
+        emit OrderStatusChanged(_orderId, OrderStatus.Completed);
+
+        // Trigger reward distribution
+        // IRewardDistributor(rewardTokencontract).distributeReward(order.farmer, farmerAmount);
+    }
+
+    // ============== VIEW FUNCTIONS ============
+
+    function getListing(
+        uint256 _listingId
+    ) external view returns (ProductListing memory) {
+        return listings[_listingId];
+    }
+
+    function getOrder(uint256 _orderId) external view returns (Order memory) {
+        return orders[_orderId];
+    }
+
+    function getFarmerListings(
+        address _farmer
+    ) external view returns (uint256[] memory) {
+        return farmerListings[_farmer];
+    }
+
+    function getBuyerOrders(
+        address _buyer
+    ) external view returns (uint256[] memory) {
+        return buyerOrders[_buyer];
+    }
+
+    function getFarmerStats(
+        address _farmer
+    ) external view returns (FarmerStats memory) {
+        return farmerStats[_farmer];
+    }
+
+    // ============= ADMIN FUNCTIONS ==========
 
     function changeStatus(
         uint256 _listingId,
@@ -468,5 +592,38 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
     ) external onlyRole(ADMIN_ROLE) {
         ProductListing storage listing = listings[_listingId];
         listing.status = _status;
+    }
+
+    function updatePlatformFee(
+        uint256 _newFeePercent
+    ) external onlyRole(ADMIN_ROLE) {
+        require(_newFeePercent <= 1000, "Fee to high");
+        platformFeePercent = _newFeePercent;
+    }
+
+    function updateFeeCollector(
+        address _newCollector
+    ) external onlyRole(ADMIN_ROLE) {
+        require(_newCollector != address(0), "Invalid address");
+        feeCollector = _newCollector;
+    }
+
+    function verifyFarmer(address _farmer) external onlyRole(ADMIN_ROLE) {
+        grantRole(VERIFIED_FARMER_ROLE, _farmer);
+        farmerStats[_farmer].isActive = true;
+        emit FarmerVerified(_farmer, block.timestamp);
+    }
+
+    function suspendListing(uint256 _listingId) external onlyRole(ADMIN_ROLE) {
+        listings[_listingId].status = ListingStatus.Suspended;
+        emit ListingStatusChanged(_listingId, ListingStatus.Suspended);
+    }
+
+    function pause() external onlyRole(ADMIN_ROLE) {
+        _pause();
+    }
+
+    function unpause() external onlyRole(ADMIN_ROLE) {
+        _unpause();
     }
 }
