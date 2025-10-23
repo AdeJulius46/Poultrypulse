@@ -1,76 +1,38 @@
+// app/login/page.tsx
 "use client";
 
-import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
-import { Logo } from "@/components/layout/logo";
-import Link from "next/link";
-// import { useToast } from '@/components/ui/use-toast';
+import Image from "next/image";
 
 export default function LoginPage() {
-  const router = useRouter();
-  // const { toast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const response = {
-        ok: true,
-        data: {
-          message: "Login successful",
-          error: null,
-        },
-      };
-      const data = response.data;
-
-      if (response.ok) {
-        // Successful login
-        router.push("/dashboard"); // or wherever you want to redirect
-      } else {
-        // Handle error
-        // toast({
-        //   variant: "destructive",
-        //   title: "Error",
-        //   description: data.error || "Login failed"
-        // });
-        console.error("Login failed:", data.error);
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    // Handle login logic here
+    console.log("Login:", { email, password, rememberMe });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.name, e.target.value);
+  const handleMetamaskLogin = () => {
+    // Handle Metamask login
+    console.log("Metamask login");
+  };
 
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  const handleGoogleLogin = () => {
+    // Handle Google login
+    console.log("Google login");
   };
 
   return (
-    <main className="flex min-h-screen ">
-      {/* Left Side - Hero Section  */}
-      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-gray-900 via-gray-900 to-gray-900 relative overflow-hidden">
+    <div className="flex min-h-screen">
+      {/* Left Side - Hero Section */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+        {/* Background Image */}
         <div className="absolute inset-0 opacity-30">
           <Image
-            src={"/rectangle-172.png"}
+            src="/chicken-background.jpg" // Add your chicken image
             alt="Background"
             fill
             className="object-cover"
@@ -78,13 +40,18 @@ export default function LoginPage() {
         </div>
 
         {/* Content */}
-        <div className="relatice z-10 flex flex-col items-center justify-center w-full p-12 text-white">
-          {/* Logo  */}
+        <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-white">
+          {/* Logo */}
           <div className="flex items-center gap-3 mb-8">
-            <Logo />
+            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-2xl">🐔</span>
+            </div>
+            <h1 className="text-3xl font-bold">
+              Poultry <span className="font-serif italic">Pulse</span>
+            </h1>
           </div>
 
-          {/* Main Heading  */}
+          {/* Main Heading */}
           <div className="text-center mb-6">
             <h2 className="text-4xl font-bold mb-4">
               Protect Your Flock with
@@ -93,9 +60,25 @@ export default function LoginPage() {
             </h2>
           </div>
 
-          {/* Subtitle 00 */}
+          {/* Icon */}
+          <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mb-4">
+            <svg
+              className="w-8 h-8 text-white"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+              <path
+                fillRule="evenodd"
+                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+
+          {/* Subtitle */}
           <p className="text-center text-gray-300 max-w-md">
-            Early detection of risks means fewer losses and healthier chickens
+            Early detection of risks means fewer losses and healthier chickens.
           </p>
 
           {/* Carousel Dots */}
@@ -107,46 +90,46 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - Login Form  */}
-
-      <div className="flex-1 flex items-center justify-center p-8 bg-gray-100 shadow-2xl">
-        <div className="w-full max-w-md lg:bg-white rounded-2xl lg:p-10">
-          {/* Header  */}
+      {/* Right Side - Login Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
+        <div className="w-full max-w-md">
+          {/* Header */}
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               Login into your Account
             </h2>
             <p className="text-gray-600">
-              Welcome back! Select method to login{" "}
+              Welcome back! Select method to login
             </p>
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email Input  */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            {/* Email Input */}
             <div>
               <input
                 type="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                required
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
               />
             </div>
 
-            {/* Password Input  */}
+            {/* Password Input */}
             <div>
               <input
                 type="password"
                 placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
               />
             </div>
 
-            {/* Remember Me & Forgot Password  */}
+            {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <label className="flex items-center">
                 <input
@@ -157,25 +140,25 @@ export default function LoginPage() {
                 />
                 <span className="ml-2 text-sm text-gray-700">Remember me</span>
               </label>
-              <Link
-                href={"/forgot-password"}
+              <a
+                href="/forgot-password"
                 className="text-sm text-green-600 hover:text-green-700"
               >
                 Forgotten Password?
-              </Link>
+              </a>
             </div>
 
-            {/* Login Button  */}
+            {/* Login Button */}
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition- cursor-pointer"
+              className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
             >
               Login
             </button>
           </form>
 
-          {/* Divider  */}
-          <div className="relative my-2">
+          {/* Divider */}
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
@@ -186,9 +169,10 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          {/* Social Login Buttons */}
+          <div className="space-y-3">
             {/* Metamask Button */}
-            {/* <button
+            <button
               onClick={handleMetamaskLogin}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
@@ -205,12 +189,12 @@ export default function LoginPage() {
               <span className="font-medium text-gray-700">
                 Sign in with metamask
               </span>
-            </button> */}
+            </button>
 
             {/* Google Button */}
             <button
-              // onClick={""}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -236,10 +220,11 @@ export default function LoginPage() {
             </button>
           </div>
 
+          {/* Sign Up Link */}
           <p className="text-center mt-6 text-sm text-gray-600">
             Don't have an account?{" "}
             <a
-              href="/register"
+              href="/signup"
               className="text-green-600 hover:text-green-700 font-medium"
             >
               Create an account
@@ -247,6 +232,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

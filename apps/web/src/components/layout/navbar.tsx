@@ -22,20 +22,20 @@ export function Navbar() {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              href="#features" 
+            <Link
+              href="#features"
               className="text-gray-300 hover:text-white transition-colors duration-200 font-sans"
             >
               Features
             </Link>
-            <Link 
-              href="#pricing" 
+            <Link
+              href="#pricing"
               className="text-gray-300 hover:text-white transition-colors duration-200 font-sans"
             >
               Pricing
             </Link>
-            <Link 
-              href="#solution" 
+            <Link
+              href="#solution"
               className="text-gray-300 hover:text-white transition-colors duration-200 font-sans"
             >
               Our Solution
@@ -44,17 +44,17 @@ export function Navbar() {
 
           {/* Desktop Action Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link 
-              href="/login" 
+            <Link
+              href="/login"
               className="text-poultry-green-400 hover:text-poultry-green-300 transition-colors duration-200 font-sans"
             >
               Login
             </Link>
-            <Button 
+            <Button
               asChild
               className="bg-poultry-green-500 hover:bg-poultry-green-600 text-white font-medium px-6 py-2 rounded-lg transition-colors duration-200"
             >
-              <Link href="/signup">Create Account</Link>
+              <Link href="/register">Create Account</Link>
             </Button>
           </div>
 
@@ -106,11 +106,11 @@ export function Navbar() {
                 >
                   Login
                 </Link>
-                <Button 
+                <Button
                   asChild
                   className="w-full mt-2 bg-poultry-green-500 hover:bg-poultry-green-600 text-white font-medium px-6 py-2 rounded-lg"
                 >
-                  <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
+                  <Link href="/register" onClick={() => setIsMenuOpen(false)}>
                     Create Account
                   </Link>
                 </Button>
