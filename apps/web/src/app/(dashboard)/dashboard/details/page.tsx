@@ -236,7 +236,7 @@ export const Details = () => {
         {/* Increased height for reward points */}
         <header className="flex items-end justify-between mb-6">
           <div className="flex items-end gap-5">
-            <span className="font-paragraph-small-medium font-[number:var(--paragraph-small-medium-font-weight)] text-[#8c8c8c] text-[length:var(--paragraph-small-medium-font-size)] tracking-[var(--paragraph-small-medium-letter-spacing)] leading-[var(--paragraph-small-medium-line-height)] [font-style:var(--paragraph-small-medium-font-style)]">
+            <span className="`font-paragraph-small-medium font-[number:var(--paragraph-small-medium-font-weight)] text-[#8c8c8c] text-[length:var(--paragraph-small-medium-font-size)] tracking-[var(--paragraph-small-medium-letter-spacing)] leading-[var(--paragraph-small-medium-line-height)] [font-style:var(--paragraph-small-medium-font-style)]">
               Token Balance
             </span>
             <EyeOffIcon className="w-5 h-5 text-[#8c8c8c]" />

@@ -28,7 +28,7 @@ const sidebarItems = [
   { icon: FolderOpen, href: "/insights", label: "Insights" },
   // { icon: Instagram, href: "/profiles", label: "Profiles" },
   { icon: Calendar, href: "/wallet", label: "Wallet" },
-  { icon: Clock, href: "/subscription", label: "Subscription" },
+  { icon: Clock, href: "/marketplace", label: "Marketplace" },
   { icon: BarChart, href: "/settings", label: "Settings" },
 
 ];
