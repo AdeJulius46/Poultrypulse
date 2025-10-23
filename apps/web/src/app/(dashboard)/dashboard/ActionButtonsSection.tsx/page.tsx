@@ -16,12 +16,16 @@ interface ActionButtonsSectionProps {
   batches?: Batch[];
   onBatchSelect?: (batchId: string) => void;
   className?: string;
+  selectedBatch?: string;
+  showBatchSelection?: boolean;
 }
 
 export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({ 
   batches: initialBatches,
   onBatchSelect,
-  className = ""
+  className = "",
+  selectedBatch: externalSelectedBatch,
+  showBatchSelection = true
 }) => {
   const defaultBatches: Batch[] = [
     {
@@ -56,7 +60,10 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  const activeBatch = batches.find(batch => batch.isActive) || batches[0];
+  // Use external selected batch if provided, otherwise use internal state
+  const activeBatch = externalSelectedBatch 
+    ? batches.find(batch => batch.id === externalSelectedBatch) || batches[0]
+    : batches.find(batch => batch.isActive) || batches[0];
 
   const handleBatchClick = (batchId: string) => {
     const updatedBatches = batches.map(batch => ({
@@ -114,49 +121,51 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
 
   return (
     <div className="w-[600px]">
-      {/* Header with batch selection - Same width as token balance component */}
-      <div className="bg-white border-2 border-green-400 rounded-2xl p-6 mb-4 shadow-sm">
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          {batches.map((batch) => (
+      {/* Header with batch selection - Only show if showBatchSelection is true */}
+      {showBatchSelection && (
+        <div className="bg-white border-2 border-green-400 rounded-2xl p-6 mb-4 shadow-sm">
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {batches.map((batch) => (
+              <Button
+                key={batch.id}
+                variant="ghost"
+                size="sm"
+                onClick={() => handleBatchClick(batch.id)}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200
+                  min-w-[100px] h-auto text-sm font-medium
+                  ${getBatchClassName(batch)}
+                `}
+              >
+                {batch.icon && (
+                  <img
+                    className="w-5 h-5 shrink-0"
+                    alt="Batch icon"
+                    src={batch.icon}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                )}
+                <span className="whitespace-nowrap">
+                  {batch.label}
+                </span>
+              </Button>
+            ))}
+
             <Button
-              key={batch.id}
               variant="ghost"
               size="sm"
-              onClick={() => handleBatchClick(batch.id)}
-              className={`
-                flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200
-                min-w-[100px] h-auto text-sm font-medium
-                ${getBatchClassName(batch)}
-              `}
+              className="flex items-center gap-2 px-6 py-2 bg-green-50 text-green-600 
+                       hover:bg-green-100 rounded-xl border border-green-200 text-sm font-medium
+                       transition-all duration-200"
             >
-              {batch.icon && (
-                <img
-                  className="w-5 h-5 flex-shrink-0"
-                  alt="Batch icon"
-                  src={batch.icon}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                />
-              )}
-              <span className="whitespace-nowrap">
-                {batch.label}
-              </span>
+              <span>See more batches</span>
             </Button>
-          ))}
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-2 px-6 py-2 bg-green-50 text-green-600 
-                     hover:bg-green-100 rounded-xl border border-green-200 text-sm font-medium
-                     transition-all duration-200"
-          >
-            <span>See more batches</span>
-          </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Video/Stream container - Same width as above component */}
       <div className="relative bg-gray-900 rounded-2xl overflow-hidden shadow-lg" style={{ aspectRatio: '16/9' }}>

@@ -42,22 +42,25 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname(); // ✅ Current path
 
   return (
-    <>
-    <div className=" h-[700px] shadow-2xl  rounded-lg   bg-white ">
-
+    <div className="shadow-2xl rounded-lg bg-white flex flex-col" style={{ height: 'calc(100vh - 2rem)' }}>
       <button onClick={onToggle} className="pt-4 text-sm text-gray-600 bg-none">
-        {isOpen ? <div className="flex items-center mt-[30px]  px-5 ">
-           <Image src={"/poultry.svg"}   width={150} height={150} alt=""/> 
-          </div>:  <div className=" ">   <Image src={"/logo1.svg"}    width={50}  height={50}  alt=""/> </div>}
+        {isOpen ? (
+          <div className="flex items-center mt-[30px] px-5">
+            <Image src={"/poultry.svg"} width={150} height={150} alt=""/> 
+          </div>
+        ) : (
+          <div className="p-4">
+            <Image src={"/logo1.svg"} width={50} height={50} alt=""/> 
+          </div>
+        )}
       </button>
 
       {isOpen && (
-        <div className=" w-full  py-4   lg:w-[260px] ">
-          <div className={cn("w-full  lg:w-[260px]   border-r", className)}>
-            <div className="space-y-2 py-4">
+        <div className="flex-1 flex flex-col w-full lg:w-[260px] min-h-0">
+          <div className={cn("w-full lg:w-[260px] border-r flex-1 flex flex-col min-h-0", className)}>
+            <div className="space-y-2 py-4 flex-1 min-h-0">
               <div className="px-6 py-2">
                 <div className="space-y-1">
-                  <div></div>
                   {sidebarItems.map((item) => {
                     const isActive = pathname === item.href;
                     return (
@@ -65,15 +68,15 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
                         key={item.href}
                         href={item.href}
                         className={cn(
-                          "flex items-center py-4   px-4 w-[180px] text-sm font-medium rounded-[15.29px]  transition-colors",
+                          "flex items-center py-4 px-4 w-[180px] text-sm font-medium rounded-[15.29px] transition-colors",
                           isActive
                             ? "bg-[#2E7D32] text-[#FFFFFF]"
-                            : "text-[#737791]  bg-[#FFFFFF] hover:text-gray-900 hover:bg-gray-50"
+                            : "text-[#737791] bg-[#FFFFFF] hover:text-gray-900 hover:bg-gray-50"
                         )}
                       >
                         <item.icon
                           className={cn(
-                            "h-5 w-5 mr-3 flex-shrink-0",
+                            "h-5 w-5 mr-3 shrink-0",
                             isActive ? "text-[#FFFFFF]" : ""
                           )}
                         />
@@ -81,27 +84,21 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
                       </Link>
                     );
                   })}
-                  
-                
-
                 </div>
-
               </div>
             </div>
-          </div>
 
-          <div className="flex items-center justify-center py-[190px]">
-         
-            <Image 
-            src={"/Group 144.svg"}
-            width={120}
-            height={100}
-            alt="image"
-            />
+            <div className="flex items-center justify-center py-8 mt-auto">
+              <Image 
+                src={"/Group 144.svg"}
+                width={120}
+                height={100}
+                alt="image"
+              />
+            </div>
           </div>
         </div>
       )}
- </div>
-    </>
+    </div>
   );
 }
