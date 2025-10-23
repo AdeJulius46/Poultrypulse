@@ -147,12 +147,21 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { Navbar } from "@/components/layout/navbar";
+import { ProblemsSection } from "@/components/sections/problems-section";
+import { FeaturesSection } from "@/components/sections/features-section";
+import { DetailedFeaturesSection } from "@/components/sections/detailed-features-section";
+import { PricingSection } from "@/components/sections/pricing-section";
+import { CTASection } from "@/components/sections/cta-section";
+import { Footer } from "@/components/sections/footer";
 
 
 export default function Home() {
   const router = useRouter();
   return (
-    <main className=" bg-[#000] w-full min-w-[1440px] min-h-[1024px] relative">
+    <div className="min-h-screen relative">
+      <Navbar />
+      <main className="bg-black w-full min-w-[1440px] min-h-[1024px] relative">
       <img
         className="object-cover absolute top-[calc(50.00%_-_492px)] left-[calc(50.00%_-_698px)] w-[1397px] h-[984px] rounded-xl"
         alt="Rectangle"
@@ -161,27 +170,15 @@ export default function Home() {
 
       <div className="bg-[#000000d9] absolute top-[calc(50.00%_-_492px)] left-[calc(50.00%_-_698px)] w-[1397px] h-[984px] rounded-xl" />
 
-      <header className="inline-flex items-center gap-[4.82px] absolute top-[243px] left-[calc(50.00%_-_638px)]">
-        <img
-          className="relative w-[45px] h-[44.13px]"
-          alt="Untitled design"
-          src="/untitled-design--98--1-1.png"
-        />
 
-        <div className="relative w-fit mt-[-1.61px] [font-family:'Playfair_Display',Helvetica] font-normal text-transparent text-[33.8px] text-center leading-[33.8px]">
-          <span className="font-semibold text-white tracking-[-0.57px] leading-[45px]">
-            Poultry
-          </span>
-
-          <span className="font-semibold text-white tracking-[0] leading-[0.1px]">
-            &nbsp;
-          </span>
-
-          <span className="italic text-white tracking-[-0.46px] leading-[45px]">
-            Pulse
+      <div className="inline-flex items-center gap-[4.82px] absolute top-[243px] left-[82px]">
+        <div className="bg-green-900 px-8 py-2.5 rounded-2xl">
+          <span className="text-white font-medium text-lg">
+            Web3 Powered Poultry Management
           </span>
         </div>
-      </header>
+      </div>
+
 
       <section className="absolute top-[349px] left-[81px] w-[455px]">
         <h1 className="[font-family:'Gilroy-SemiBold-SemiBold',Helvetica] font-semibold text-white text-[38px] tracking-[-0.76px] leading-[39px]">
@@ -200,15 +197,19 @@ export default function Home() {
         </p>
       </section>
 
-      <div className="absolute top-[654px] left-[calc(50.00%_-_639px)] h-[52px] justify-end w-[190px] flex">
-        <Button className="w-[190px] h-[52px] px-8 py-3.5 rounded-xl bg-[linear-gradient(180deg,rgba(54,146,59,1)_0%,rgba(39,174,46,1)_100%)] hover:bg-[linear-gradient(180deg,rgba(54,146,59,0.9)_0%,rgba(39,174,46,0.9)_100%)] border-0 h-auto"   
-                onClick={() => router.push("/register")}
-       
-       
-       >
-          <span className="font-paragraph-medium-medium font-[number:var(--paragraph-medium-medium-font-weight)] text-white text-[length:var(--paragraph-medium-medium-font-size)] tracking-[var(--paragraph-medium-medium-letter-spacing)] leading-[var(--paragraph-medium-medium-line-height)] [font-style:var(--paragraph-medium-medium-font-style)]">
-            Get Started
-          </span>
+      <div className="absolute top-[580px] left-[82px] h-[72px] w-[500px] flex gap-4">
+        <Button 
+          className="px-10 py-6 rounded-xl bg-[linear-gradient(180deg,rgba(54,146,59,1)_0%,rgba(39,174,46,1)_100%)] hover:bg-[linear-gradient(180deg,rgba(54,146,59,0.9)_0%,rgba(39,174,46,0.9)_100%)] border-0 text-lg font-medium"   
+          onClick={() => router.push("/register")}
+        >
+          Create Account
+        </Button>
+
+        <Button 
+          className="px-10 py-6 rounded-xl bg-white text-green-600 hover:bg-gray-100 transition-colors duration-200 text-lg font-medium"   
+          onClick={() => router.push("/login")}
+        >
+          Login
         </Button>
       </div>
 
@@ -217,6 +218,25 @@ export default function Home() {
         alt="Group"
         src="/group-150-2.png"
       />
-    </main>
+      </main>
+      
+      {/* Problems Section */}
+      <ProblemsSection />
+      
+      {/* Features Section */}
+      <FeaturesSection />
+      
+      {/* Detailed Features Section */}
+      <DetailedFeaturesSection />
+      
+      {/* Pricing Section */}
+      <PricingSection />
+      
+      {/* CTA Section */}
+      <CTASection />
+      
+      {/* Footer */}
+      <Footer />
+    </div>
   );
 };

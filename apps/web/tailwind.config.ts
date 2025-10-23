@@ -56,6 +56,16 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Custom colors for Poultry Pulse
+        "poultry-green": {
+          400: "#4ade80", // Light green for logo background
+          500: "#22c55e", // Green for buttons
+          600: "#16a34a", // Darker green for hover states
+        },
+        "poultry-gray": {
+          800: "#1f2937", // Dark gray for navbar background
+          700: "#374151", // Slightly lighter gray for mobile menu
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
