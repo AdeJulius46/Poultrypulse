@@ -46,6 +46,10 @@ ifeq ($(findstring --network polygon,$(ARGS)),--network polygon)
 	NETWORK_ARGS := --rpc-url $(P_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast -vvvv
 endif
 
+ifeq ($(findstring --network hedera,$(ARGS)),--network hedera)
+	NETWORK_ARGS := --rpc-url $(HEDERA_TESTNET_RPC_URL) --private-key $(HEDERA_PRIVATE_KEY) --broadcast -vvvv
+endif
+
 
 
 deploy:

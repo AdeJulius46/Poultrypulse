@@ -1,24 +1,27 @@
+"use client";
+
 import { Details } from "./details/page";
 import { ActionButtonsSection } from "./ActionButtonsSection.tsx/page";
 import { PredictionsSection } from "./PredictionsSection .tsx/page";
 import { RecommendationsSection } from "./RecommendationsSection.tsx/page";
+import DashboardHeader from "@/components/layout/dashboardHeader";
 
 export default function DashboardPage() {
   return (
-    <div className="bg-[#f2f2f2] p-6">
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-4 flex flex-col gap-6">
+    <div className="bg-[#f2f2f2] min-h-screen p-3 lg:p-0 pt-3 w-full sm:p-4 md:p-6">
+      {/* Mobile: Stack vertically, Tablet: 2 columns, Desktop: Side by side */}
+      <DashboardHeader text={"Dashboard"} />
+      <div className="flex flex-col lg:flex-row w-full mx-auto">
+        {/* Left Column - Token Balance & Video Feed */}
+
+        <div className="flex flex-col sm:gap-6 gap-6 w-full px-3 lg:w-[60%] ">
           <Details />
           <ActionButtonsSection />
         </div>
 
-        <div className="w-[430px] ml-[290px] flex flex-col gap-6">
-          <PredictionsSection />
+        {/* Right Column - Predictions & Recommendations */}
+        <div className="flex flex-col gap-4 sm:gap-6 w-full lg:w-[40%] ">
           <RecommendationsSection />
-        </div>
-
-        <div className="col-span-9">
-          {/* <LiveFeedSection /> */}
         </div>
       </div>
     </div>

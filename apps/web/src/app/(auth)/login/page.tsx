@@ -5,7 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Logo } from "@/components/layout/logo";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 // import { useToast } from '@/components/ui/use-toast';
 
 export default function LoginPage() {
@@ -13,6 +16,8 @@ export default function LoginPage() {
   // const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,26 +28,15 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-    //   const response = await fetch("/api/auth/login", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(formData),
-    //   });
+      setIsLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
 
-    //   const data = await response.json();
-      const response = {
-        ok: true,
-        data: {
-          message: "Login successful",
-          error: null,
-        },
-      };
-      const data = response.data;
-
-      if (response.ok) {
+      if (data.user !== null) {
         // Successful login
+        console.log(data);
         router.push("/dashboard"); // or wherever you want to redirect
       } else {
         // Handle error
@@ -51,9 +45,10 @@ export default function LoginPage() {
         //   title: "Error",
         //   description: data.error || "Login failed"
         // });
-        console.error("Login failed:", data.error);
+        console.error("Login failed:", error);
       }
-    } catch (error) {
+    } catch (error: any) {
+      alert("Login error: " + error.message);
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
@@ -61,6 +56,8 @@ export default function LoginPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.name, e.target.value);
+
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -68,102 +65,194 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-sm">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="LoopDeck" width={100} height={100} />
-
-          <div className="ml-auto">
-            <select className="bg-transparent text-sm font-medium">
-              <option value="en">ENG</option>
-              <option value="es">ESP</option>
-            </select>
-          </div>
+    <main className="flex min-h-screen ">
+      {/* Left Side - Hero Section  */}
+      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-gray-900 via-gray-900 to-gray-900 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <Image
+            src={"/rectangle-172.png"}
+            alt="Background"
+            fill
+            className="object-cover"
+          />
         </div>
 
-        {/* Info Box */}
-        <div className="bg-blue-50 text-blue-700 p-4 rounded-lg">
-          <p>
-            LoopDeck allows a business to expand its reach and enhance digital
-            marketing solutions.{" "}
-            <a href="#" className="underline">
-              Read more
-            </a>
-          </p>
-        </div>
-
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Email <span className="text-red-500">*</span>
-            </label>
-            <Input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email Address"
-              required
-            />
+        {/* Content */}
+        <div className="relatice z-10 flex flex-col items-center justify-center w-full p-12 text-white">
+          {/* Logo  */}
+          <div className="flex items-center gap-3 mb-8">
+            <Logo />
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Password <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <Input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            </div>
+          {/* Main Heading  */}
+          <div className="text-center mb-6">
+            <h2 className="text-4xl font-bold mb-4">
+              Protect Your Flock with
+              <br />
+              Confidence
+            </h2>
           </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-[#46237A] hover:bg-[#46237A]/90 text-white font-medium"
-            disabled={isLoading}
-          >
-            {isLoading ? "Logging in..." : "Log in"}
-          </Button>
-        </form>
-
-        {/* Links */}
-        <div className="text-center space-y-4">
-          <p className="text-sm text-gray-600">
-            No LoopDeck account?{" "}
-            <a href="/register" className="text-[#46237A] font-medium">
-              Create one
-            </a>
+          {/* Subtitle 00 */}
+          <p className="text-center text-gray-300 max-w-md">
+            Early detection of risks means fewer losses and healthier chickens
           </p>
-          <a href="#" className="text-sm text-[#46237A] font-medium block">
-            Forgot your password?
-          </a>
 
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
+          {/* Carousel Dots */}
+          <div className="flex gap-2 mt-8">
+            <div className="w-2 h-2 bg-white rounded-full"></div>
+            <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Right Side - Login Form  */}
+
+      <div className="flex-1 flex items-center justify-center p-8 bg-gray-100 shadow-2xl">
+        <div className="w-full max-w-md lg:bg-white rounded-2xl lg:p-10">
+          {/* Header  */}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Login into your Account
+            </h2>
+            <p className="text-gray-600">
+              Welcome back! Select method to login{" "}
+            </p>
+          </div>
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email Input  */}
+            <div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Password Input  */}
+            <div>
+              <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Remember Me & Forgot Password  */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                />
+                <span className="ml-2 text-sm text-gray-700">Remember me</span>
+              </label>
+              <Link
+                href={"/forgot-password"}
+                className="text-sm text-green-600 hover:text-green-700"
+              >
+                Forgotten Password?
+              </Link>
+            </div>
+
+            {/* Login Button  */}
+            <button
+              type="submit"
+              className="w-full flex bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition- cursor-pointer items-center justify-center"
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Login"
+              )}
+            </button>
+          </form>
+
+          {/* Divider  */}
+          <div className="relative my-2">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-gray-50 text-gray-500">
+                or continue with
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {/* Metamask Button */}
+            {/* <button
+              onClick={handleMetamaskLogin}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M21.5 12L19 15.5L17 13.5L19.5 9.5L21.5 12Z"
+                  fill="#E17726"
+                />
+                <path
+                  d="M2.5 12L5 15.5L7 13.5L4.5 9.5L2.5 12Z"
+                  fill="#E27625"
+                />
+              </svg>
+              <span className="font-medium text-gray-700">
+                Sign in with metamask
+              </span>
+            </button> */}
+
+            {/* Google Button */}
+            <button
+              // onClick={""}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
+              <span className="font-medium text-gray-700">
+                Sign in with Google
+              </span>
+            </button>
+          </div>
+
+          <p className="text-center mt-6 text-sm text-gray-600">
+            Don't have an account?{" "}
+            <a
+              href="/register"
+              className="text-green-600 hover:text-green-700 font-medium"
+            >
+              Create an account
+            </a>
+          </p>
+        </div>
+      </div>
+    </main>
   );
 }
