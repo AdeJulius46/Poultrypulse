@@ -47,7 +47,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
           "fixed lg:static inset-y-0 left-0 z-100 flex flex-col bg-white shadow-2xl rounded-lg transition-all duration-300 ease-in-out",
           isOpen
             ? "w-[260px] translate-x-0"
-            : "w-[80px] -translate-x-full lg:translate-x-0",
+            : "w-20 -translate-x-full lg:translate-x-0",
           "lg:h-[700px] h-screen",
           className
         )}
