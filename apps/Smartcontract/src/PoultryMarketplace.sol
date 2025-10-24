@@ -7,6 +7,36 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 import {Token} from "./poultryPulseToken.sol";
 
+interface ISupplyChain {
+    enum Stage {
+        NotStarted,
+        Farm,
+        Packed,
+        InTransit,
+        Delivered
+    }
+
+    function initiateTracking(
+        uint256 orderId,
+        address farmer,
+        address buyer
+    ) external;
+
+    function updateStage(
+        uint256 orderId,
+        Stage newStage,
+        bytes32 locationHash,
+        int16 temp,
+        uint8 humidity,
+        string memory notes
+    ) external;
+
+    function verifyDelivery(
+        uint256 orderId,
+        bytes32 deliveryProofHash
+    ) external;
+}
+
 /**
  * @title Poultry Marketplace
  * @notice core marketplace contract for Poultry Pulse ecosystem
@@ -355,7 +385,7 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         emit OrderStatusChanged(_orderId, OrderStatus.Confirmed);
 
         // Notify supply chain contract to start tracking
-        // ISupplyChain(supplyChainContract).intitateTracking(_orderId);
+        ISupplyChain(supplyChainContract).initiateTracking(_orderId, order.farmer, order.buyer);
     }
 
     /**

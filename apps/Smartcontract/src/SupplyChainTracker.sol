@@ -39,8 +39,6 @@ contract SupplyChainTracker is AccessControl, Pausable {
         Stage stage;
         address actor;
         bytes32 locationHash;
-        int16 temperature;
-        uint8 humidity;
         uint256 timestamp;
         string notes;
     }
@@ -73,7 +71,7 @@ contract SupplyChainTracker is AccessControl, Pausable {
     // =============== EVENTs ===================
     event TrackingInitiated(
         uint256 indexed orderId,
-        address indexed farner,
+        address indexed farmer,
         address indexed buyer,
         uint256 timestamp
     );
@@ -105,7 +103,7 @@ contract SupplyChainTracker is AccessControl, Pausable {
         uint256 timestamp
     );
 
-    event TrackingCompleted(uint indexed orderId, uint totalDuration);
+    event TrackingCompleted(uint indexed orderId, uint indexed totalDuration);
 
     // ============= CONSTRUCTOR =========
 
@@ -122,7 +120,7 @@ contract SupplyChainTracker is AccessControl, Pausable {
         _;
     }
 
-    modifier onlyOrderParticipnat(uint256 _orderId) {
+    modifier onlyOrderParticipant(uint256 _orderId) {
         SupplyChainEntry memory entry = trackingEntries[_orderId];
         require(
             msg.sender == entry.farmer ||
@@ -172,8 +170,6 @@ contract SupplyChainTracker is AccessControl, Pausable {
                 stage: Stage.Farm,
                 actor: _farmer,
                 locationHash: bytes32(0),
-                temperature: 0,
-                humidity: 0,
                 timestamp: block.timestamp,
                 notes: "Tracking initiated"
             })
@@ -199,13 +195,11 @@ contract SupplyChainTracker is AccessControl, Pausable {
         uint256 _orderId,
         Stage _newStage,
         bytes32 _locationHash,
-        int16 _temperature,
-        uint8 _humidity,
         string memory _notes
     )
         external
         onlyActiveTracking(_orderId)
-        onlyOrderParticipnat(_orderId)
+        onlyOrderParticipant(_orderId)
         whenNotPaused
     {
         SupplyChainEntry storage entry = trackingEntries[_orderId];
@@ -214,7 +208,6 @@ contract SupplyChainTracker is AccessControl, Pausable {
         // Validate stage progression
         require(_newStage > previousStage, "Invalid stage progression");
         require(_newStage <= Stage.Delivered, "Invalid stage");
-        require(_humidity <= 100, "Invalid humidity value");
 
         // Update current stage
         entry.currentStage = _newStage;
@@ -226,17 +219,10 @@ contract SupplyChainTracker is AccessControl, Pausable {
                 stage: _newStage,
                 actor: msg.sender,
                 locationHash: _locationHash,
-                temperature: _temperature,
-                humidity: _humidity,
                 timestamp: block.timestamp,
                 notes: _notes
             })
         );
-
-        // Update environmental data
-        if (_temperature != 0 || _humidity != 0) {
-            _recordEnvironmentalData(_orderId, _temperature, _humidity);
-        }
 
         emit StageUpdated(
             _orderId,
@@ -254,6 +240,106 @@ contract SupplyChainTracker is AccessControl, Pausable {
         if (_newStage == Stage.Delivered) {
             _completeTracking(_orderId);
         }
+    }
+
+    /**
+     * @notice Add environmental monitoring data
+     * @dev Can be called multiple times during journey
+     */
+    function addEnvironmentalReading(
+        uint256 _orderId,
+        int16 _temperature,
+        uint8 _humidity
+    )
+        external
+        onlyActiveTracking(_orderId)
+        onlyOrderParticipant(_orderId)
+        whenNotPaused
+    {
+        require(_humidity <= 100, "Invalid humidity value");
+        require(
+            _temperature >= -40 && _temperature <= 80,
+            "Temperature out of range"
+        );
+
+        _recordEnvironmentalData(_orderId, _temperature, _humidity);
+
+        emit EnvironmentalDataRecorded(
+            _orderId,
+            _temperature,
+            _humidity,
+            block.timestamp
+        );
+    }
+
+    /**
+     * @notice Update location with photo/GPS data
+     */
+    function updateLocation(
+        uint256 _orderId,
+        bytes32 _locationHash
+    )
+        external
+        onlyActiveTracking(_orderId)
+        onlyOrderParticipant(_orderId)
+        whenNotPaused
+    {
+        require(_locationHash != bytes32(0), "Invalid location hash");
+
+        // Add location update to history
+        stageHistory[_orderId].push(
+            StageUpdate({
+                stage: trackingEntries[_orderId].currentStage,
+                actor: msg.sender,
+                locationHash: _locationHash,
+                timestamp: block.timestamp,
+                notes: "Location update"
+            })
+        );
+
+        emit LocationUpdated(_orderId, _locationHash, block.timestamp);
+    }
+
+    // ================= BUYER FUNCTIONS ===============
+
+    /**
+     * @notice Verify delivery completion
+     * @dev Called by buyer or marketplace when delivery is confirmed
+     */
+    function verifyDelivery(
+        uint256 _orderId,
+        bytes32 _deliveryProofHash
+    ) external onlyActiveTracking(_orderId) whenNotPaused {
+        SupplyChainEntry storage entry = trackingEntries[_orderId];
+        require(
+            msg.sender == entry.buyer || hasRole(MARKETPLACE_ROLE, msg.sender),
+            "Only buyer or marketplace can verify"
+        );
+        require(entry.currentStage == Stage.InTransit, "Not in transit");
+
+        // Update to delivered stage
+        entry.currentStage = Stage.Delivered;
+        stageTimestamps[_orderId][Stage.Delivered] = block.timestamp;
+
+        // Record final stage
+        stageHistory[_orderId].push(
+            StageUpdate({
+                stage: Stage.Delivered,
+                actor: msg.sender,
+                locationHash: _deliveryProofHash,
+                timestamp: block.timestamp,
+                notes: "Delivery verified by buyer"
+            })
+        );
+
+        emit DeliveryVerified(_orderId, entry.buyer, block.timestamp);
+        emit StageUpdated(
+            _orderId,
+            Stage.InTransit,
+            Stage.Delivered,
+            msg.sender,
+            block.timestamp
+        );
     }
 
     // ================= INTERNAL FUNCTIONS ==================
@@ -292,5 +378,227 @@ contract SupplyChainTracker is AccessControl, Pausable {
         uint256 totalDuration = block.timestamp - entry.initiatedAt;
 
         emit TrackingCompleted(_orderId, totalDuration);
+    }
+
+    // ========== ADMIN FUNCTIONS ==========
+
+    /**
+     * @notice Grant marketplace role to contract
+     */
+    /**
+     * @notice Grant marketplace role to contract
+     */
+    function setMarketplace(
+        address _marketplace
+    ) external onlyRole(ADMIN_ROLE) {
+        require(_marketplace != address(0), "Invalid marketplace address");
+        grantRole(MARKETPLACE_ROLE, _marketplace);
+    }
+
+    /**
+     * @notice Grant farmer role for manual updates
+     */
+    function addFarmer(address _farmer) external onlyRole(ADMIN_ROLE) {
+        require(_farmer != address(0), "Invalid farmer address");
+        grantRole(FARMER_ROLE, _farmer);
+    }
+
+    /**
+     * @notice Remove farmer role
+     */
+    function removeFarmer(address _farmer) external onlyRole(ADMIN_ROLE) {
+        revokeRole(FARMER_ROLE, _farmer);
+    }
+
+    /**
+     * @notice Emergency pause
+     */
+    function pause() external onlyRole(ADMIN_ROLE) {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause contract
+     */
+    function unpause() external onlyRole(ADMIN_ROLE) {
+        _unpause();
+    }
+
+    /**
+     * @notice Manually complete tracking (emergency)
+     */
+    function forceCompleteTracking(
+        uint256 _orderId
+    ) external onlyRole(ADMIN_ROLE) {
+        require(isTracking[_orderId], "Order not tracked");
+        _completeTracking(_orderId);
+    }
+
+    // ============== VIEW FUNCTIONS =========
+    /**
+     * @notice Get current stage of an order
+     */
+    function getEntryTimestamp(
+        uint256 _orderId
+    ) external view returns (uint256) {
+        SupplyChainEntry storage entry = trackingEntries[_orderId];
+        return entry.initiatedAt;
+    }
+
+    /**
+     * @notice Get complete tracking information for QR code display
+     */
+    function getTrackingInfo(
+        uint256 _orderId
+    )
+        external
+        view
+        returns (
+            SupplyChainEntry memory entry,
+            StageUpdate[] memory history,
+            EnvironmentalData memory envData
+        )
+    {
+        return (
+            trackingEntries[_orderId],
+            stageHistory[_orderId],
+            environmentalData[_orderId]
+        );
+    }
+
+    /**
+     * @notice Get simplified data for consumer QR scan
+     */
+    // function getQRData(
+    //     uint256 _orderId
+    // )
+    //     external
+    //     view
+    //     returns (
+    //         address farmer,
+    //         Stage currentStage,
+    //         uint256[] memory timestamps,
+    //         int16 temperature,
+    //         uint8 humidity,
+    //         bool isCompleted
+    //     )
+    // {
+    //     SupplyChainEntry memory entry = trackingEntries[_orderId];
+    //     EnvironmentalData memory envData = environmentalData[_orderId];
+
+    //     // Build timestamps array for all stages
+    //     timestamps = new uint256[](5);
+    //     timestamps[0] = stageTimestamps[_orderId][Stage.NotStarted];
+    //     timestamps[1] = stageTimestamps[_orderId][Stage.Farm];
+    //     timestamps[2] = stageTimestamps[_orderId][Stage.Packed];
+    //     timestamps[3] = stageTimestamps[_orderId][Stage.InTransit];
+    //     timestamps[4] = stageTimestamps[_orderId][Stage.Delivered];
+
+    //     return (
+    //         entry.farmer,
+    //         entry.currentStage,
+    //         timestamps,
+    //         !entry.isActive
+    //     );
+    // }
+
+    /**
+     * @notice Get current stage of an order
+     */
+    function getCurrentStage(uint256 _orderId) external view returns (Stage) {
+        return trackingEntries[_orderId].currentStage;
+    }
+
+    /**
+     * @notice Get timestamp for a specific stage
+     */
+    function getStageTimestamp(
+        uint256 _orderId,
+        Stage _stage
+    ) external view returns (uint256) {
+        return stageTimestamps[_orderId][_stage];
+    }
+
+    /**
+     * @notice Get all stage updates for an order
+     */
+    function getStageHistory(
+        uint256 _orderId
+    ) external view returns (StageUpdate[] memory) {
+        return stageHistory[_orderId];
+    }
+
+    /**
+     * @notice Get latest environmental data
+     */
+    function getEnvironmentalData(
+        uint256 _orderId
+    )
+        external
+        view
+        returns (
+            int16[] memory temperature,
+            uint8[] memory humidity,
+            uint256 lastUpdated,
+            uint8 readingCount
+        )
+    {
+        EnvironmentalData memory data = environmentalData[_orderId];
+        return (
+            data.latestTemperature,
+            data.latestHumidity,
+            data.lastUpdated,
+            data.readingCount
+        );
+    }
+
+    /**
+     * @notice Get all active orders
+     */
+    function getActiveOrders() external view returns (uint256[] memory) {
+        uint256 count = 0;
+
+        // Count active orders
+        for (uint256 i = 0; i < activeOrders.length; i++) {
+            if (trackingEntries[activeOrders[i]].isActive) {
+                count++;
+            }
+        }
+
+        // Build array of active order IDs
+        uint256[] memory active = new uint256[](count);
+        uint256 index = 0;
+
+        for (uint256 i = 0; i < activeOrders.length; i++) {
+            if (trackingEntries[activeOrders[i]].isActive) {
+                active[index] = activeOrders[i];
+                index++;
+            }
+        }
+
+        return active;
+    }
+
+    /**
+     * @notice Check if order is being tracked
+     */
+    function isOrderTracked(uint256 _orderId) external view returns (bool) {
+        return isTracking[_orderId];
+    }
+
+    /**
+     * @notice Get journey duration
+     */
+    function getJourneyDuration(
+        uint256 _orderId
+    ) external view returns (uint256) {
+        SupplyChainEntry memory entry = trackingEntries[_orderId];
+
+        if (entry.isActive) {
+            return block.timestamp - entry.initiatedAt;
+        } else {
+            uint256 deliveryTime = stageTimestamps[_orderId][Stage.Delivered];
+            return deliveryTime - entry.initiatedAt;
+        }
     }
 }

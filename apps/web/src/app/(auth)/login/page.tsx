@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 // import { useToast } from '@/components/ui/use-toast';
 
 export default function LoginPage() {
@@ -27,17 +28,15 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = {
-        ok: true,
-        data: {
-          message: "Login successful",
-          error: null,
-        },
-      };
-      const data = response.data;
+      setIsLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
 
-      if (response.ok) {
+      if (data.user !== null) {
         // Successful login
+        console.log(data);
         router.push("/dashboard"); // or wherever you want to redirect
       } else {
         // Handle error
@@ -46,9 +45,10 @@ export default function LoginPage() {
         //   title: "Error",
         //   description: data.error || "Login failed"
         // });
-        console.error("Login failed:", data.error);
+        console.error("Login failed:", error);
       }
-    } catch (error) {
+    } catch (error: any) {
+      alert("Login error: " + error.message);
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
@@ -127,6 +127,7 @@ export default function LoginPage() {
             <div>
               <input
                 type="email"
+                name="email"
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
@@ -139,6 +140,7 @@ export default function LoginPage() {
             <div>
               <input
                 type="password"
+                name="password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleChange}
@@ -168,9 +170,13 @@ export default function LoginPage() {
             {/* Login Button  */}
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition- cursor-pointer"
+              className="w-full flex bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition- cursor-pointer items-center justify-center"
             >
-              Login
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Login"
+              )}
             </button>
           </form>
 
