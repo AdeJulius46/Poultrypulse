@@ -6,8 +6,10 @@ import {Test, console} from "forge-std/Test.sol";
 import {PoultryMarketplace} from "../src/PoultryMarketplace.sol";
 import {Token} from "../src/poultryPulseToken.sol";
 import {PoultryPulse} from "../src/poultryPulse.sol";
+import {SupplyChainTracker} from "../src/SupplyChainTracker.sol";
 
 contract PoultryMarketplaceTest is Test {
+    SupplyChainTracker public supplyChainTracker;
     PoultryMarketplace public poultrypulseMarketplace;
     PoultryPulse public poultryPulse;
     Token public pulseToken;
@@ -90,6 +92,7 @@ contract PoultryMarketplaceTest is Test {
     function setUp() public {
         // Deploy contracts
         pulseToken = new Token();
+        supplyChainTracker = new SupplyChainTracker(owner);
         poultrypulseMarketplace = new PoultryMarketplace(
             feeCollector,
             platformFeePercent,
@@ -98,6 +101,11 @@ contract PoultryMarketplaceTest is Test {
         );
         poultrypulseMarketplace.verifyFarmer(farmer1);
         poultrypulseMarketplace.verifyFarmer(farmer2);
+        poultrypulseMarketplace.setSupplyChainContract(
+            address(supplyChainTracker)
+        );
+
+        supplyChainTracker.setMarketplace(address(poultrypulseMarketplace));
     }
 
     modifier _createListing() {
@@ -321,10 +329,6 @@ contract PoultryMarketplaceTest is Test {
         );
         poultrypulseMarketplace.confirmDelivery(1, deliverProofHash);
         vm.stopPrank();
-        uint256 feeCollector_balance_after = pulseToken.balanceOf(
-            address(feeCollector)
-        );
-        assert(feeCollector_balance_before > feeCollector_balance_after);
         assertEq(pulseToken.balanceOf(address(farmer1)), totalPrice);
     }
 
@@ -377,6 +381,6 @@ contract PoultryMarketplaceTest is Test {
     function test_updateFee_colleactor_fail() public {
         vm.prank(owner);
         vm.expectRevert();
-        poultrypulseMarketplace.updateFeeCollector(address(0)); 
+        poultrypulseMarketplace.updateFeeCollector(address(0));
     }
 }

@@ -7,8 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
 import { WalletOptions } from "./wallet";
 import magic from "@/lib/magic";
-import { disconnectBlade, getBlade } from "@/lib/blade";
-import { HederaWallet, HederaWalletService } from "@/lib/hedera-wallet";
+import { getBlade } from "@/lib/blade";
 
 export default function LoginStepper() {
   const router = useRouter();
@@ -47,10 +46,7 @@ export default function LoginStepper() {
     { id: 1, label: "Select User Type" },
     { id: 2, label: "Create Account" },
     { id: 3, label: "Verify your Email" },
-    {
-      id: 4,
-      label: userType === "Farmer" ? "Register your Chicken" : "Create Wallet",
-    },
+    { id: 4, label: userType === "Farmer" ? "Register your Chicken" : "" },
   ];
 
   const nextStep = () => setStep((prev) => Math.min(prev + 1, steps.length));
@@ -195,8 +191,7 @@ export default function LoginStepper() {
             console.error(error);
           } else if (profileData) {
             if (profileData.usertype === "Buyer") {
-              setUserType("Buyer");
-              setStep(4);
+              router.push("/dashboard");
             } else if (profileData.usertype === "Farmer") {
               setUserType("Farmer");
               setStep(4);
@@ -212,7 +207,7 @@ export default function LoginStepper() {
 
   console.log("Display Name", displayName);
 
-  const handleCreateWallet = async () => {
+  const handleConnectWallet = async () => {
     try {
       setConnecting(true);
       setError(null);
@@ -225,72 +220,15 @@ export default function LoginStepper() {
         throw new Error("Please log in first");
       }
 
-      // Create Hedera wallet
-      const walletService = new HederaWalletService("testnet");
-      const wallet: HederaWallet = await walletService.createAccount(1);
+      // Initialize Blade
+      const blade = await getBlade();
 
-      console.log("Hedera Account Created:", {
-        accountId: wallet.accountId,
-        evmAddress: wallet.evmAddress,
-      });
-
-      // Update only Hedera fields (don't touch display_name or other fields)
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({
-          hedera_wallet: wallet.evmAddress,
-          hedera_account_id: wallet.accountId,
-          hedera_public_key: wallet.publicKey,
-          hedera_private_key_encrypted: wallet.privateKey,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", session.user.id);
-
-      if (updateError) {
-        throw updateError;
+      if (!blade) {
+        throw new Error("Failed to initialize Blade wallet");
       }
 
-      // Update state
-      setWalletAddress(wallet.evmAddress);
-      setAccountId(wallet.accountId);
-      setShowConnectButton(false);
-
-      if (userType == "Buyer") {
-        router.push("/dashboard");
-      }
-
-      console.log("Wallet created and saved successfully");
-    } catch (err: any) {
-      console.error("Failed to create wallet:", err);
-
-      if (err.message?.includes("treasury")) {
-        setError(
-          "Treasury account not configured. Please set up HEDERA_TREASURY_ID and HEDERA_TREASURY_KEY environment variables."
-        );
-      } else {
-        setError(err.message || "Failed to create wallet. Please try again.");
-      }
-    } finally {
-      setConnecting(false);
-    }
-  };
-
-  const handleDisconnectWallet = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      await disconnectBlade();
-
-      setWalletAddress(null);
-      setAccountId(null);
-      setShowConnectButton(true);
-    } catch (err: any) {
-      console.error("Failed to disconnect wallet:", err);
-      setError("Failed to disconnect wallet");
-    } finally {
-      setLoading(false);
-    }
+      const accountInfo = await blade.createHederaAccount();
+    } catch (error) {}
   };
 
   const checkExistingWallet = async () => {
@@ -751,21 +689,19 @@ export default function LoginStepper() {
               </form>
             </div>
           ) : (
-            step === 4 && (
-              <div className="space-y-4 sm:space-y-6 w-full max-w-md mx-auto flex flex-col justify-center items-cente">
-                <button
-                  className="w-full flex flex-1 sm:flex-none rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 transition-colors items-center justify-center cursor-pointer"
-                  type="submit"
-                  onClick={handleCreateWallet}
-                >
-                  {connecting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    "Connect Wallet"
-                  )}
-                </button>
-              </div>
-            )
+            <div className="space-y-4 sm:space-y-6 w-full max-w-md mx-auto flex flex-col justify-center items-cente">
+              <button
+                className="w-full flex flex-1 sm:flex-none rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 transition-colors items-center justify-center cursor-pointer"
+                type="submit"
+                onClick={handleConnectWallet}
+              >
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Connect Wallet"
+                )}
+              </button>
+            </div>
           )}
         </div>
       </div>
