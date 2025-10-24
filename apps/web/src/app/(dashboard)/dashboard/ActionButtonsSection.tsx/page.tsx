@@ -20,6 +20,8 @@ interface ActionButtonsSectionProps {
   batches?: Batch[];
   onBatchSelect?: (batchId: string) => void;
   className?: string;
+  selectedBatch?: string;
+  showBatchSelection?: boolean;
 }
 
 export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
@@ -127,7 +129,6 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4">
           {batches.map((batch) => (
             <Button
-              key={batch.id}
               variant="ghost"
               size="sm"
               onClick={() => handleBatchClick(batch.id)}
@@ -165,7 +166,7 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
             <span className="whitespace-nowrap">See more batches</span>
           </Button> */}
         </div>
-      </div>
+      )}
 
       {/* Video/Stream container */}
       <div
