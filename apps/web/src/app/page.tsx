@@ -10,9 +10,6 @@ import { PricingSection } from "@/components/sections/pricing-section";
 import { CTASection } from "@/components/sections/cta-section";
 import { Footer } from "@/components/sections/footer";
 
-import Header from "@/components/header";
-import Hero from "@/components/hero";
-
 export default function Home() {
   const router = useRouter();
   return (
