@@ -26,6 +26,7 @@ const sidebarItems = [
   { icon: Clock, href: "/subscription", label: "Subscription" },
   { icon: BarChart, href: "/settings", label: "Settings" },
   { icon: ShoppingBasket, href: "/marketplace", label: "Marketplace" },
+  { icon: Calendar, href: "/inventory", label: "Inventory" },
 ];
 
 export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
@@ -35,7 +36,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-0 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onToggle}
         />
       )}
@@ -43,7 +44,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-100 flex flex-col bg-white shadow-2xl rounded-lg transition-all duration-300 ease-in-out",
+          "fixed lg:static inset-y-0 left-0 z-50 flex flex-col bg-white shadow-2xl rounded-lg transition-all duration-300 ease-in-out",
           isOpen
             ? "w-[260px] translate-x-0"
             : "w-20 -translate-x-full lg:translate-x-0",

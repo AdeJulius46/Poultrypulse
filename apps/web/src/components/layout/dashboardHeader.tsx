@@ -9,13 +9,16 @@ import {
   ArrowRight,
   Utensils,
   Shield,
+  Menu,
 } from "lucide-react";
+import { useStore } from "@/lib/store";
 
 interface Headerprops {
   text: String;
 }
 
 const DashboardHeader: React.FC<Headerprops> = ({ text }) => {
+  const toggleSidebar = useStore((state) => state.toggleSidebar);
   return (
     <div className=" px-4 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -37,6 +40,11 @@ const DashboardHeader: React.FC<Headerprops> = ({ text }) => {
               3
             </div>
           </div>
+
+          <Menu
+            className="lg:hidden  cursor-pointer"
+            onClick={() => toggleSidebar()}
+          />
         </div>
       </div>
     </div>

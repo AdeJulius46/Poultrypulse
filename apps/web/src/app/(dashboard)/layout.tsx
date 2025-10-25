@@ -2,6 +2,7 @@
 
 // import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { useStore } from "@/lib/store";
 import { useState } from "react";
 
 export default function DashboardLayout({
@@ -9,9 +10,11 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // const [sidebarOpen, setSidebarOpen] = useState(true);
+  const sidebarOpen = useStore((state) => state.sidebarOpen);
+  const setSidebarOpen = useStore((state) => state.sidebarOpen);
+  const toggleSidebar = useStore((state) => state.toggleSidebar);
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   return (
     <div className="min-h-screen bg-[#f2f2f2] ]  relative ">
       <div className="shadow-lg">{/* <Header /> */}</div>

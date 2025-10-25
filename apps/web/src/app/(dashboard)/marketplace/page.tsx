@@ -13,9 +13,12 @@ import {
   ShoppingBag,
   ShoppingCart,
   Star,
+  Loader2,
 } from "lucide-react";
 import DashboardHeader from "@/components/layout/dashboardHeader";
 import { useRouter } from "next/navigation";
+import { Product } from "@/lib/store";
+import { supabase } from "@/lib/supabase";
 
 // Mock DashboardHeader component
 
@@ -24,7 +27,8 @@ export default function MarketplacePage() {
   const [currentVideo, setCurrentVideo] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-
+  const [products, setProducts] = useState<Product[]>();
+  const [loading, setLoading] = useState(true);
   const videos = [
     {
       id: 1,
@@ -115,10 +119,11 @@ export default function MarketplacePage() {
     bookmarks: string;
     shares: string;
     videoUrl: string;
+    farmer_id: string;
   };
 
   type VideoCardProps = {
-    video: Video;
+    video: Product;
     index?: number;
     isActive?: boolean;
   };
@@ -212,7 +217,7 @@ export default function MarketplacePage() {
           <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
             <div className="text-white text-center">
               <p className="text-lg mb-2">Failed to load video</p>
-              <p className="text-sm text-gray-400">{video.videoUrl}</p>
+              <p className="text-sm text-gray-400">{video.media_urls[0]}</p>
             </div>
           </div>
         )}
@@ -220,25 +225,25 @@ export default function MarketplacePage() {
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
           <video
             ref={videoRef}
-            src={video.videoUrl}
+            src={video.media_urls[0]}
             className="w-full h-full object-cover"
             controls
             autoPlay
             muted
             loop
             onLoadedData={() => {
-              console.log("Video loaded:", video.videoUrl);
+              console.log("Video loaded:", video.media_urls[0]);
               setIsLoading(false);
               setHasError(false);
             }}
             onError={(e) => {
               console.error("Video error:", e);
-              console.log("Failed to load:", video.videoUrl);
+              console.log("Failed to load:", video.media_urls[0]);
               setHasError(true);
               setIsLoading(false);
             }}
             onCanPlay={() => {
-              console.log("Video can play:", video.videoUrl);
+              console.log("Video can play:", video.media_urls[0]);
               setIsLoading(false);
             }}
           >
@@ -250,13 +255,16 @@ export default function MarketplacePage() {
         <div className="absolute bottom-0 left-0 right-0 px-4 md:p-6 z-10">
           <div className="flex items-end justify-between">
             <div className="flex-1 text-white mb-10 md:mb-0">
-              <div className="font-semibold text-base md:text-lg mb-2 drop-shadow-lg">
-                @{video.username}
+              <div
+                className="font-semibold text-base md:text-lg mb-2 drop-shadow-lg cursor-pointer"
+                onClick={() => router.push(`/marketplace/${video.farmer_id}`)}
+              >
+                @{video.farmer_name}
               </div>
               <div className="text-sm md:text-base mb-3 pr-12 drop-shadow-lg flex flex-col space-y-4">
                 <p>{video.description}</p>
                 <p className="relative font-bold text-xl">
-                  #3000
+                  {video.price_per_bird}
                   <span className="absolute -top-2 font-normal text-sm">
                     Per bird
                   </span>
@@ -287,7 +295,7 @@ export default function MarketplacePage() {
                   />
                 </button>
                 <span className="text-white text-xs font-semibold mt-1 drop-shadow-lg">
-                  {video.ratings}
+                  4.3
                 </span>
               </div>
 
@@ -303,6 +311,24 @@ export default function MarketplacePage() {
       </div>
     );
   };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data, error } = await supabase
+        .from("inventory_public")
+        .select("*")
+        .order("created_at", { ascending: false });
+      console.log(data);
+      if (error) {
+        console.error("Error:", error);
+      } else {
+        setProducts(data || []);
+      }
+      setLoading(false);
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div className="flex flex-col h-screen max-w-7xl mx-auto ">
@@ -362,7 +388,7 @@ export default function MarketplacePage() {
           }}
         >
           {isMobile ? (
-            videos.map((video, index) => (
+            products?.map((video, index) => (
               <VideoCard
                 key={video.id}
                 video={video}
@@ -373,11 +399,19 @@ export default function MarketplacePage() {
           ) : (
             <div className="h-full w-full flex items-center justify-center relative">
               <div className="h-full w-[600px]">
-                <VideoCard
-                  video={videos[currentVideo]}
-                  index={currentVideo}
-                  isActive={true}
-                />
+                {loading ? (
+                  <>
+                    Loading <Loader2 className="w-4 h-4 animate-spin" />
+                  </>
+                ) : products && products.length > 0 ? (
+                  <VideoCard
+                    video={products[currentVideo]}
+                    index={currentVideo}
+                    isActive={true}
+                  />
+                ) : (
+                  <div>No products available</div>
+                )}
               </div>
 
               {currentVideo > 0 && (
