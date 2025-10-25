@@ -30,7 +30,6 @@ const sidebarItems = [
 
 export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
-
   return (
     <>
       {/* Mobile Overlay */}

@@ -121,7 +121,7 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
   }, [streamError, activeBatch]);
 
   return (
-    <div className={`w-full max-w-screen mx-auto ${className}`}>
+    <div className={`w-full max-w-screen mx-auto  ${className}`}>
       {/* Header with batch selection */}
       <div className="bg-white border-2 border-green-400 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 mb-3 sm:mb-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4">
