@@ -4,50 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Plus, 
-  Bell, 
-  Crown, 
-  Check,
-  CreditCard,
-  Calendar
-} from "lucide-react";
+import { Plus, Bell, Crown, Check, CreditCard, Calendar } from "lucide-react";
+import DashboardHeader from "@/components/layout/dashboardHeader";
 
 export default function SubscriptionPage() {
-    return (
-    <div className="flex-1 bg-gray-50 min-h-screen p-2 sm:p-4 lg:p-6">
+  return (
+    <div className="max-w-7xl mx-auto p-6 flex-1 bg-gray-50 min-h-screen p-2 sm:p-4 lg:p-6">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 mb-4 sm:mb-6 rounded-lg shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Subscription</h1>
-          <div className="flex items-center justify-between sm:justify-end space-x-1 sm:space-x-2 lg:space-x-4">
-            {/* Add New Batch Button - Icon only on mobile */}
-            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9">
-              <Plus className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Add New Batch</span>
-            </Button>
-            
-            {/* Wallet Address Button - Icon only on mobile */}
-            <Button variant="outline" className="flex items-center justify-center text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9 border-gray-300">
-              <span className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2">🦊</span>
-              <span className="hidden sm:inline">0x67dfD......8df9E5</span>
-              <span className="sm:hidden">Wallet</span>
-            </Button>
-            
-            {/* Avatar */}
-            <Avatar className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 border-2 border-gray-200">
-              <AvatarImage src="/avatar.png" />
-              <AvatarFallback className="text-xs sm:text-sm font-medium">U</AvatarFallback>
-            </Avatar>
-            
-            {/* Notification Bell */}
-            <Button size="icon" variant="ghost" className="relative w-8 h-8 sm:w-9 sm:h-9 hover:bg-gray-100">
-              <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full border border-white"></span>
-            </Button>
-          </div>
-        </div>
-      </div>
+      <DashboardHeader text={"Subscription"} />
 
       {/* Main Content */}
       <div className="space-y-4 sm:space-y-6">
@@ -70,18 +34,31 @@ export default function SubscriptionPage() {
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-xl sm:text-2xl font-bold text-green-800">Starter</h3>
-                    <Badge className="bg-green-500 text-white text-xs px-3 py-1 rounded-full shadow-md">Current</Badge>
+                    <h3 className="text-xl sm:text-2xl font-bold text-green-800">
+                      Starter
+                    </h3>
+                    <Badge className="bg-green-500 text-white text-xs px-3 py-1 rounded-full shadow-md">
+                      Current
+                    </Badge>
                   </div>
                   <div className="mb-4">
-                    <p className="text-3xl sm:text-4xl font-black text-green-700 mb-1">5 $BAG</p>
-                    <p className="text-sm text-green-600 font-medium">per batch</p>
+                    <p className="text-3xl sm:text-4xl font-black text-green-700 mb-1">
+                      5 $BAG
+                    </p>
+                    <p className="text-sm text-green-600 font-medium">
+                      per batch
+                    </p>
                   </div>
                   <div className="bg-white/60 rounded-lg p-3 mb-4">
-                    <p className="text-sm text-gray-700 font-medium">30 chickens per batch</p>
+                    <p className="text-sm text-gray-700 font-medium">
+                      30 chickens per batch
+                    </p>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white font-semibold py-3 rounded-xl transition-all duration-200">
+                <Button
+                  variant="outline"
+                  className="w-full border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white font-semibold py-3 rounded-xl transition-all duration-200"
+                >
                   Cancel Subscription
                 </Button>
               </div>
@@ -94,9 +71,13 @@ export default function SubscriptionPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold mb-3">Professional</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3">
+                    Professional
+                  </h3>
                   <div className="mb-4">
-                    <p className="text-3xl sm:text-4xl font-black mb-1">10 $BAG</p>
+                    <p className="text-3xl sm:text-4xl font-black mb-1">
+                      10 $BAG
+                    </p>
                     <p className="text-sm opacity-90 font-medium">per batch</p>
                   </div>
                   <div className="bg-white/20 rounded-lg p-3 mb-4 backdrop-blur-sm">
@@ -107,7 +88,10 @@ export default function SubscriptionPage() {
                   <Button className="w-full bg-white text-green-600 hover:bg-gray-100 font-semibold py-3 rounded-xl shadow-lg transition-all duration-200">
                     Upgrade Now
                   </Button>
-                  <Button variant="ghost" className="w-full border border-white/30 text-white hover:bg-white/20 font-medium py-2 rounded-xl transition-all duration-200">
+                  <Button
+                    variant="ghost"
+                    className="w-full border border-white/30 text-white hover:bg-white/20 font-medium py-2 rounded-xl transition-all duration-200"
+                  >
                     Learn more
                   </Button>
                 </div>
@@ -121,9 +105,13 @@ export default function SubscriptionPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold mb-3">Enterprise</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3">
+                    Enterprise
+                  </h3>
                   <div className="mb-4">
-                    <p className="text-3xl sm:text-4xl font-black mb-1">15 $BAG</p>
+                    <p className="text-3xl sm:text-4xl font-black mb-1">
+                      15 $BAG
+                    </p>
                     <p className="text-sm opacity-90 font-medium">per batch</p>
                   </div>
                   <div className="bg-white/20 rounded-lg p-3 mb-4 backdrop-blur-sm">
@@ -134,7 +122,10 @@ export default function SubscriptionPage() {
                   <Button className="w-full bg-white text-orange-600 hover:bg-gray-100 font-semibold py-3 rounded-xl shadow-lg transition-all duration-200">
                     Upgrade Now
                   </Button>
-                  <Button variant="ghost" className="w-full border border-white/30 text-white hover:bg-white/20 font-medium py-2 rounded-xl transition-all duration-200">
+                  <Button
+                    variant="ghost"
+                    className="w-full border border-white/30 text-white hover:bg-white/20 font-medium py-2 rounded-xl transition-all duration-200"
+                  >
                     Learn more
                   </Button>
                 </div>
@@ -164,8 +155,12 @@ export default function SubscriptionPage() {
                   <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <CreditCard className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-gray-800 text-base font-semibold">Card ending in **** 1234</span>
-                  <p className="text-sm text-green-600 font-medium mt-2 bg-green-100 px-3 py-1 rounded-full">Primary</p>
+                  <span className="text-gray-800 text-base font-semibold">
+                    Card ending in **** 1234
+                  </span>
+                  <p className="text-sm text-green-600 font-medium mt-2 bg-green-100 px-3 py-1 rounded-full">
+                    Primary
+                  </p>
                 </div>
               </div>
 
@@ -175,7 +170,9 @@ export default function SubscriptionPage() {
                   <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <CreditCard className="w-6 h-6 text-gray-400" />
                   </div>
-                  <span className="text-gray-500 text-sm font-medium">No other payment method</span>
+                  <span className="text-gray-500 text-sm font-medium">
+                    No other payment method
+                  </span>
                 </div>
               </div>
 
@@ -185,8 +182,12 @@ export default function SubscriptionPage() {
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-200">
                     <Plus className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-blue-700 text-base font-semibold">Add Payment Method</span>
-                  <p className="text-xs text-blue-600 mt-1">Click to add new card</p>
+                  <span className="text-blue-700 text-base font-semibold">
+                    Add Payment Method
+                  </span>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Click to add new card
+                  </p>
                 </div>
               </div>
             </div>
@@ -210,7 +211,9 @@ export default function SubscriptionPage() {
                     <Crown className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-900 text-base sm:text-lg">Subscription Upgraded</div>
+                    <div className="font-semibold text-gray-900 text-base sm:text-lg">
+                      Subscription Upgraded
+                    </div>
                     <div className="text-sm text-gray-600 flex items-center mt-1">
                       <Calendar className="w-4 h-4 mr-2 text-purple-500" />
                       26/9/2025
@@ -218,8 +221,12 @@ export default function SubscriptionPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-red-600 text-lg sm:text-xl">- 15 BAG</div>
-                  <div className="text-sm text-gray-600 bg-red-100 px-3 py-1 rounded-full mt-1">Enterprise Plan</div>
+                  <div className="font-bold text-red-600 text-lg sm:text-xl">
+                    - 15 BAG
+                  </div>
+                  <div className="text-sm text-gray-600 bg-red-100 px-3 py-1 rounded-full mt-1">
+                    Enterprise Plan
+                  </div>
                 </div>
               </div>
 
@@ -230,7 +237,9 @@ export default function SubscriptionPage() {
                     <Crown className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-900 text-base sm:text-lg">Subscription Upgraded</div>
+                    <div className="font-semibold text-gray-900 text-base sm:text-lg">
+                      Subscription Upgraded
+                    </div>
                     <div className="text-sm text-gray-600 flex items-center mt-1">
                       <Calendar className="w-4 h-4 mr-2 text-purple-500" />
                       26/9/2025
@@ -238,8 +247,12 @@ export default function SubscriptionPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-red-600 text-lg sm:text-xl">- 10 BAG</div>
-                  <div className="text-sm text-gray-600 bg-green-100 px-3 py-1 rounded-full mt-1">Professional Plan</div>
+                  <div className="font-bold text-red-600 text-lg sm:text-xl">
+                    - 10 BAG
+                  </div>
+                  <div className="text-sm text-gray-600 bg-green-100 px-3 py-1 rounded-full mt-1">
+                    Professional Plan
+                  </div>
                 </div>
               </div>
 
@@ -250,7 +263,9 @@ export default function SubscriptionPage() {
                     <CreditCard className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-900 text-base sm:text-lg">Subscription Paid</div>
+                    <div className="font-semibold text-gray-900 text-base sm:text-lg">
+                      Subscription Paid
+                    </div>
                     <div className="text-sm text-gray-600 flex items-center mt-1">
                       <Calendar className="w-4 h-4 mr-2 text-purple-500" />
                       26/9/2025
@@ -258,8 +273,12 @@ export default function SubscriptionPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-red-600 text-lg sm:text-xl">- 5 BAG</div>
-                  <div className="text-sm text-gray-600 bg-blue-100 px-3 py-1 rounded-full mt-1">Starter Plan</div>
+                  <div className="font-bold text-red-600 text-lg sm:text-xl">
+                    - 5 BAG
+                  </div>
+                  <div className="text-sm text-gray-600 bg-blue-100 px-3 py-1 rounded-full mt-1">
+                    Starter Plan
+                  </div>
                 </div>
               </div>
 
@@ -270,7 +289,9 @@ export default function SubscriptionPage() {
                     <Calendar className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-900 text-base sm:text-lg">Subscription Renewed</div>
+                    <div className="font-semibold text-gray-900 text-base sm:text-lg">
+                      Subscription Renewed
+                    </div>
                     <div className="text-sm text-gray-600 flex items-center mt-1">
                       <Calendar className="w-4 h-4 mr-2 text-purple-500" />
                       15/9/2025
@@ -278,14 +299,18 @@ export default function SubscriptionPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-red-600 text-lg sm:text-xl">- 5 BAG</div>
-                  <div className="text-sm text-gray-600 bg-purple-100 px-3 py-1 rounded-full mt-1">Starter Plan</div>
+                  <div className="font-bold text-red-600 text-lg sm:text-xl">
+                    - 5 BAG
+                  </div>
+                  <div className="text-sm text-gray-600 bg-purple-100 px-3 py-1 rounded-full mt-1">
+                    Starter Plan
+                  </div>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-      </div>
-    );
-  }
+    </div>
+  );
+}

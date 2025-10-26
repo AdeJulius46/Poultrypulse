@@ -1,13 +1,30 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-  typescript: {
-    // Optional: also ignore TypeScript errors if needed
-    // ignoreBuildErrors: true,
+  webpack: (
+    config: { resolve: { alias: any; fallback: any } },
+    { isServer }: any
+  ) => {
+    // Ignore React Native async-storage in web builds
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@react-native-async-storage/async-storage": false,
+    };
+
+    // Additional fallbacks for node modules
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+      };
+    }
+
+    return config;
   },
 };
 

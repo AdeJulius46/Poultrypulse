@@ -7,11 +7,8 @@ import {
   Clock,
   TrendingUp,
 } from "lucide-react";
-import { Card, CardContent } from "../../../../components/ui/card";
-import {
-  fetchChickenMonitoring,
-  ChickenMonitoring,
-} from "../../../../lib/supabase";
+import { Card, CardContent } from "./ui/card";
+import { fetchChickenMonitoring, ChickenMonitoring } from "../lib/supabase";
 
 interface DetectionData {
   id: string;
