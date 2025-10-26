@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import DashboardHeader from "@/components/layout/dashboardHeader";
@@ -23,8 +23,12 @@ interface Params {
   params: { id: string };
 }
 
-export default function FarmerProfile({ params }: Params) {
-  const { id } = params; // This is the farmer's user ID (from URL)
+export default function FarmerProfile({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params); // This is the farmer's user ID (from URL)
   const [products, setProducts] = useState<Product[]>([]);
   const [farmerName, setFarmerName] = useState("Loading...");
   const [loading, setLoading] = useState(true);
