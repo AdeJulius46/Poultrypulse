@@ -166,7 +166,7 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
             <span className="whitespace-nowrap">See more batches</span>
           </Button> */}
         </div>
-      )}
+      </div>
 
       {/* Video/Stream container */}
       <div
