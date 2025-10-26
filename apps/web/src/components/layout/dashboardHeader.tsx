@@ -1,4 +1,3 @@
-import { PredictionsSection } from "@/app/(dashboard)/dashboard/PredictionsSection .tsx/page";
 import React from "react";
 import {
   ShoppingCart,
