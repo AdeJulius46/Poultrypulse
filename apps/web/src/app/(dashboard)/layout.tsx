@@ -3,7 +3,7 @@
 // import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { useStore } from "@/lib/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function DashboardLayout({
   children,
@@ -15,11 +15,23 @@ export default function DashboardLayout({
   const setSidebarOpen = useStore((state) => state.sidebarOpen);
   const toggleSidebar = useStore((state) => state.toggleSidebar);
 
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (sidebarOpen && window.innerWidth < 1024) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
   return (
     <div className="min-h-screen bg-[#f2f2f2] ]  relative ">
       <div className="shadow-lg">{/* <Header /> */}</div>
       <div className="flex ">
-        <div className=" rounded-lg shadow-xl  absolute  top-0 left-4  mt-4   ">
+        <div className=" rounded-lg shadow-xl  absolute  top-0 left-4  mt-4 z-9999   ">
           <div className={`${sidebarOpen ? "  fixed" : ""}`}>
             <Sidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
           </div>

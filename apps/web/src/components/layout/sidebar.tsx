@@ -52,20 +52,34 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
       setSidebarItems(farmersItems);
     }
   }, [userType]);
+
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (isOpen && window.innerWidth < 1024) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay - Higher z-index */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-9998 lg:hidden"
           onClick={onToggle}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Even higher z-index to be above overlay */}
       <div
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-50 flex flex-col bg-white shadow-2xl rounded-lg transition-all duration-300 ease-in-out",
+          "fixed lg:static inset-y-0 left-0 z-9999 flex flex-col bg-white shadow-2xl rounded-lg transition-all duration-300 ease-in-out",
           isOpen
             ? "w-[260px] translate-x-0"
             : "w-20 -translate-x-full lg:translate-x-0",
@@ -141,7 +155,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
         </div>
 
         {/* Bottom Image - Only show when open */}
-        {isOpen && (
+        {/* {isOpen && (
           <div className="flex items-center justify-center p-6 border-t">
             <Image
               src="/Group 144.svg"
@@ -151,7 +165,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
               className="object-contain"
             />
           </div>
-        )}
+        )} */}
       </div>
     </>
   );

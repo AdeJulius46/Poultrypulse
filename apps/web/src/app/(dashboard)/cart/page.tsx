@@ -1,19 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShoppingBag, Bell, Plus, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import DashboardHeader from "@/components/layout/dashboardHeader";
+import { supabase } from "@/lib/supabase";
 
 interface CartItem {
   id: string;
-  name: string;
-  quantity1: string;
-  quantity2: string;
-  price: number;
+  inventory_id: string;
+  quantity: number;
+  inventory: {
+    id: string;
+    breed_type: string;
+    price_per_bird: number;
+    media_urls: string[];
+    // farmer_name: string;
+  };
 }
 
 interface Transaction {
@@ -26,43 +32,7 @@ interface Transaction {
 }
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: "1",
-      name: "Pulse",
-      quantity1: "0.12 PUL",
-      quantity2: "0.12 PUL",
-      price: 1200,
-    },
-    {
-      id: "2",
-      name: "Pulse",
-      quantity1: "0.12 PUL",
-      quantity2: "0.12 PUL",
-      price: 1200,
-    },
-    {
-      id: "3",
-      name: "Pulse",
-      quantity1: "0.12 PUL",
-      quantity2: "0.12 PUL",
-      price: 1200,
-    },
-    {
-      id: "4",
-      name: "Pulse",
-      quantity1: "0.12 PUL",
-      quantity2: "0.12 PUL",
-      price: 1200,
-    },
-    {
-      id: "5",
-      name: "Pulse",
-      quantity1: "0.12 PUL",
-      quantity2: "0.12 PUL",
-      price: 1200,
-    },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   const [transactions, setTransactions] = useState<Transaction[]>([
     {
@@ -106,10 +76,54 @@ export default function CartPage() {
       isPositive: true,
     },
   ]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleRemoveItem = (id: string) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
   };
+
+  const fetchCart = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("cart")
+      .select(
+        `
+    id,
+    inventory_id,
+    quantity,
+    inventory_public(
+      id,
+      breed_type,
+      price_per_bird,
+      media_urls
+    )
+  `
+      )
+      .eq("buyer_id", user.id);
+
+    console.log("Data is given as", data);
+    if (error) {
+      console.error(error);
+    } else {
+      const transformedData =
+        data?.map((item) => ({
+          ...item,
+          inventory: Array.isArray(item.inventory_public)
+            ? item.inventory_public[0]
+            : item.inventory_public,
+        })) || [];
+      setCartItems(transformedData);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -134,17 +148,11 @@ export default function CartPage() {
 
                       <div>
                         <h3 className="font-semibold text-sm sm:text-base md:text-lg text-gray-900">
-                          {item.name}
+                          {item.inventory?.breed_type}
                         </h3>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 mt-0.5 sm:mt-1">
                           <span className="text-xs sm:text-sm text-gray-600">
-                            {item.quantity1}
-                          </span>
-                          <span className="hidden sm:inline text-gray-400">
-                            •
-                          </span>
-                          <span className="text-xs sm:text-sm text-gray-600">
-                            {item.quantity2}
+                            Quantity: {item.quantity}
                           </span>
                         </div>
                       </div>
@@ -152,11 +160,11 @@ export default function CartPage() {
 
                     <div className="text-right">
                       <p className="font-bold text-base sm:text-lg md:text-xl text-gray-900">
-                        ${item.price}
+                        ${item.inventory?.price_per_bird}
                       </p>
                       <button
                         onClick={() => handleRemoveItem(item.id)}
-                        className="text-xs sm:text-sm text-red-500 hover:text-red-700 mt-1 sm:mt-2 font-medium transition-colors"
+                        className="text-xs sm:text-sm text-red-500 cursor-pointer hover:text-red-700 mt-1 sm:mt-2 font-medium transition-colors"
                       >
                         Remove
                       </button>
@@ -165,9 +173,12 @@ export default function CartPage() {
                 </CardContent>
               </Card>
             ))}
+            <Button className="w-full cursor-pointer bg-green-600 hover:bg-green-700 text-white rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all">
+              Proceed to Checkout
+            </Button>
 
             {/* AI Monitoring Banner */}
-            <Card className="hidden lg:flex bg-gradient-to-br from-green-50 to-emerald-50 border-0 rounded-2xl sm:rounded-3xl shadow-sm overflow-hidden mt-6 sm:mt-8">
+            <Card className="hidden lg:flex w-full bg-gradient-to-br from-green-50 to-emerald-50 border-0 rounded-2xl sm:rounded-3xl shadow-sm overflow-hidden mt-6 sm:mt-8">
               <CardContent className="p-4 sm:p-6 md:p-8">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
                   <div className="flex-1">
@@ -207,10 +218,10 @@ export default function CartPage() {
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-24 space-y-4 sm:space-y-6">
-              <Card className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl shadow-lg">
+              <Card className="hidden lg:block bg-white border border-gray-200 rounded-2xl sm:rounded-3xl shadow-lg">
                 <CardContent className="p-4 sm:p-6 md:p-8">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                    Order Summary
+                    Transactions Summary
                   </h2>
 
                   <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
@@ -244,10 +255,6 @@ export default function CartPage() {
                       </div>
                     ))}
                   </div>
-
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all">
-                    Proceed to Checkout
-                  </Button>
                 </CardContent>
               </Card>
 
