@@ -77,7 +77,7 @@ export default function LoginStepper() {
         email,
         password,
         options: {
-          emailRedirectTo: "hhttps://poultrypulse-f14b.vercel.app/callback",
+          emailRedirectTo: "https://poultrypulse-f14b.vercel.app/callback",
         },
       });
       if (signUpError) {
