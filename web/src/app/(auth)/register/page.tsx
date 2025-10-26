@@ -77,7 +77,7 @@ export default function LoginStepper() {
         email,
         password,
         options: {
-          emailRedirectTo: "http://localhost:3000/callback",
+          emailRedirectTo: "hhttps://poultrypulse-f14b.vercel.app/callback",
         },
       });
       if (signUpError) {
@@ -94,13 +94,14 @@ export default function LoginStepper() {
         );
       }
 
-      const { error: profileError } = await supabase.from("profiles").insert({
-        id: signUpUser.id,
-        display_name: displayName,
-        usertype: userType,
-      });
-
-      if (profileError) throw profileError;
+      if (signUpUser) {
+        const { error: profileError } = await supabase.from("profiles").insert({
+          id: signUpUser.id,
+          display_name: displayName,
+          usertype: userType,
+        });
+        if (profileError) throw profileError;
+      }
 
       alert("Check your email for the confirmation link!");
       nextStep(); // Move to "Verify Email" step
