@@ -9,6 +9,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useStore } from "@/lib/store";
 // import { useToast } from '@/components/ui/use-toast';
 
 export default function LoginPage() {
@@ -17,6 +18,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const setUserType = useStore((state) => state.setUserType);
+  const userType = useStore((state) => state.userType);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -36,8 +39,24 @@ export default function LoginPage() {
 
       if (data.user !== null) {
         // Successful login
+        const { data: profileData, error } = await supabase
+          .from("profiles")
+          .select("usertype")
+          .eq("id", data.user.id)
+          .single();
+        if (error) {
+          if (error instanceof Error) alert(error.message);
+        } else if (profileData) {
+          console.log("Profile Data:", profileData);
+          if (profileData.usertype === "Buyer") {
+            setUserType("Buyer");
+            router.push("/marketplace"); // or wherever you want to redirect
+          } else {
+            setUserType("Farmer");
+            router.push("/dashboard"); // or wherever you want to redirect
+          }
+        }
         console.log(data);
-        router.push("/dashboard"); // or wherever you want to redirect
       } else {
         // Handle error
         // toast({
@@ -52,6 +71,7 @@ export default function LoginPage() {
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
+      console.log("User type", userType);
     }
   };
 

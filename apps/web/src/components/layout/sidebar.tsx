@@ -12,46 +12,81 @@ import {
   BarChart,
   X,
   ShoppingBasket,
+  ShoppingCart,
 } from "lucide-react";
+import { useStore } from "@/lib/store";
+import { useEffect, useState } from "react";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-const sidebarItems = [
-  { icon: LayoutGrid, href: "/dashboard", label: "Dashboard" },
-  { icon: FolderOpen, href: "/insights", label: "Insights" },
-  { icon: Calendar, href: "/wallet", label: "Wallet" },
-  { icon: Clock, href: "/subscription", label: "Subscription" },
-  { icon: BarChart, href: "/settings", label: "Settings" },
-  { icon: ShoppingBasket, href: "/marketplace", label: "Marketplace" },
-];
-
 export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
 
+  const farmersItems = [
+    { icon: LayoutGrid, href: "/dashboard", label: "Dashboard" },
+    { icon: FolderOpen, href: "/insights", label: "Insights" },
+    { icon: Calendar, href: "/wallet", label: "Wallet" },
+    { icon: Clock, href: "/subscription", label: "Subscription" },
+    { icon: Calendar, href: "/inventory", label: "Inventory" },
+    { icon: BarChart, href: "/settings", label: "Settings" },
+  ];
+
+  const buyerItems = [
+    { icon: ShoppingBasket, href: "/marketplace", label: "Marketplace" },
+    { icon: Calendar, href: "/wallet", label: "Wallet" },
+    { icon: ShoppingCart, href: "/cart", label: "Cart" },
+    { icon: BarChart, href: "/settings", label: "Settings" },
+  ];
+
+  const [sidebarItems, setSidebarItems] = useState(buyerItems);
+
+  const userType = useStore((state) => state.userType);
+
+  useEffect(() => {
+    if (userType === "Buyer") {
+      setSidebarItems(buyerItems);
+    } else {
+      setSidebarItems(farmersItems);
+    }
+  }, [userType]);
+
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (isOpen && window.innerWidth < 1024) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay - Higher z-index */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-0 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-9998 lg:hidden"
           onClick={onToggle}
         />
       )}
 
-      {/* Sidebar */}
-       <div
-         className={cn(
-           "fixed lg:static inset-y-0 left-0 z-100 flex flex-col bg-white shadow-2xl rounded-lg transition-all duration-300 ease-in-out",
-           isOpen
-             ? "w-[260px] translate-x-0"
-             : "w-[80px] -translate-x-full lg:translate-x-0",
-           "h-screen lg:h-[calc(100vh-2rem)]",
-           className
-         )}
-       >
+      {/* Sidebar - Even higher z-index to be above overlay */}
+      <div
+        className={cn(
+          "fixed lg:static inset-y-0 left-0 z-9999 flex flex-col bg-white shadow-2xl rounded-lg transition-all duration-300 ease-in-out",
+          isOpen
+            ? "w-[260px] translate-x-0"
+            : "w-20 -translate-x-full lg:translate-x-0",
+          "lg:h-[700px] h-screen",
+          className
+        )}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b lg:border-none">
           <button
@@ -120,7 +155,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
         </div>
 
         {/* Bottom Image - Only show when open */}
-        {isOpen && (
+        {/* {isOpen && (
           <div className="flex items-center justify-center p-6 border-t">
             <Image
               src="/Group 144.svg"
@@ -130,7 +165,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
               className="object-contain"
             />
           </div>
-        )}
+        )} */}
       </div>
     </>
   );

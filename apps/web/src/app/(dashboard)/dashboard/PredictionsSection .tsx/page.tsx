@@ -18,8 +18,8 @@ export const PredictionsSection = () => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-white rounded-3xl sm:rounded-[50px] overflow-hidden p-2 sm:p-2.5 md:p-3 lg:p-1.5">
-      <div className="flex flex-col sm:flex-row h-auto sm:h-[42px] w-full  items-center justify-between gap-3 sm:gap-4 md:gap-[26px]">
+    <div className="flex items-center justify-center bg-white rounded-3xl sm:rounded-[50px] overflow-hidden p-2 sm:p-2.5 md:p-3 lg:p-1.5 lg:mr-8">
+      <div className="flex flex-col sm:flex-row h-auto sm:h-[42px] w-full  items-center justify-between gap-3 sm:gap-4 md:gap-[26px] ">
         {/* Left section - Buttons */}
         <div className="hidden cursor-pointer sm:flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-2 w-full sm:w-auto">
           <Button className="h-10 sm:h-[42px] w-full sm:w-auto sm:min-w-[140px] md:min-w-[158px] px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-3.5 rounded-3xl sm:rounded-[50px] bg-gradient-to-r from-[#36923b] to-[#27ae2e] hover:from-[#2e7d32] hover:to-[#1b5e20] text-white font-bold text-base sm:text-lg [font-family:'Afacad',Helvetica] leading-5 sm:leading-6 whitespace-nowrap cursor-pointer">

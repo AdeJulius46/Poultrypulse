@@ -9,6 +9,7 @@ import { WalletOptions } from "./wallet";
 import magic from "@/lib/magic";
 import { disconnectBlade, getBlade } from "@/lib/blade";
 import { HederaWallet, HederaWalletService } from "@/lib/hedera-wallet";
+import { useStore } from "@/lib/store";
 
 export default function LoginStepper() {
   const router = useRouter();
@@ -20,7 +21,9 @@ export default function LoginStepper() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [selectedValues, setSelectedValues] = useState("");
-  const [userType, setUserType] = useState<"Buyer" | "Farmer" | null>(null);
+  // const [userType, setUserType] = useState<"Buyer" | "Farmer" | null>(null);
+  const userType = useStore((state) => state.userType);
+  const setUserType = useStore((state) => state.setUserType);
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [formData, setFormData] = useState({
