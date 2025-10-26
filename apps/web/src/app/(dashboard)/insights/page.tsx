@@ -1,9 +1,5 @@
-import React from 'react'
+import { InsightsScreen } from "@/components/sections/insights-screen";
 
-const AnalyticsPage = () => {
-  return (
-    <div>AnalyticsPage</div>
-  )
+export default function InsightsPage() {
+  return <InsightsScreen />;
 }
-
-export default AnalyticsPage
