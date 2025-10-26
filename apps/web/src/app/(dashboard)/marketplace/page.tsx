@@ -19,6 +19,7 @@ import DashboardHeader from "@/components/layout/dashboardHeader";
 import { useRouter } from "next/navigation";
 import { Product } from "@/lib/store";
 import { supabase } from "@/lib/supabase";
+import { setLazyProp } from "next/dist/server/api-utils";
 
 // Mock DashboardHeader component
 
@@ -173,6 +174,35 @@ export default function MarketplacePage() {
     }
   };
 
+  const addToCart = async (inventoryId: string, quantity = 1) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        alert("Please log in to add to cart");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("cart")
+        .upsert(
+          { buyer_id: user.id, inventory_id: inventoryId, quantity },
+          { onConflict: "buyer_id,inventory_id" }
+        );
+
+      if (error) throw error;
+
+      alert("Added to cart");
+    } catch (error) {
+      if (error instanceof Error) {
+        alert("Error: " + error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const VideoCard: React.FC<VideoCardProps> = ({ video, isActive }) => {
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const [hasError, setHasError] = useState(false);
@@ -270,7 +300,10 @@ export default function MarketplacePage() {
                   </span>
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-sm w-full">
+              <div
+                className="flex items-center gap-2 text-sm w-full"
+                onClick={() => addToCart(video.id)}
+              >
                 <div className="bg-[#3EA843] text-white bg-opacity-30 backdrop-blur-sm px-3 py-2 cursor-pointer rounded-full">
                   + Add to Cart
                 </div>

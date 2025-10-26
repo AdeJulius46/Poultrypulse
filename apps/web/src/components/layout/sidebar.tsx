@@ -12,25 +12,46 @@ import {
   BarChart,
   X,
   ShoppingBasket,
+  ShoppingCart,
 } from "lucide-react";
+import { useStore } from "@/lib/store";
+import { useEffect, useState } from "react";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-const sidebarItems = [
-  { icon: LayoutGrid, href: "/dashboard", label: "Dashboard" },
-  { icon: FolderOpen, href: "/insights", label: "Insights" },
-  { icon: Calendar, href: "/wallet", label: "Wallet" },
-  { icon: Clock, href: "/subscription", label: "Subscription" },
-  { icon: BarChart, href: "/settings", label: "Settings" },
-  { icon: ShoppingBasket, href: "/marketplace", label: "Marketplace" },
-  { icon: Calendar, href: "/inventory", label: "Inventory" },
-];
-
 export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
+
+  const farmersItems = [
+    { icon: LayoutGrid, href: "/dashboard", label: "Dashboard" },
+    { icon: FolderOpen, href: "/insights", label: "Insights" },
+    { icon: Calendar, href: "/wallet", label: "Wallet" },
+    { icon: Clock, href: "/subscription", label: "Subscription" },
+    { icon: Calendar, href: "/inventory", label: "Inventory" },
+    { icon: BarChart, href: "/settings", label: "Settings" },
+  ];
+
+  const buyerItems = [
+    { icon: ShoppingBasket, href: "/marketplace", label: "Marketplace" },
+    { icon: Calendar, href: "/wallet", label: "Wallet" },
+    { icon: ShoppingCart, href: "/cart", label: "Cart" },
+    { icon: BarChart, href: "/settings", label: "Settings" },
+  ];
+
+  const [sidebarItems, setSidebarItems] = useState(buyerItems);
+
+  const userType = useStore((state) => state.userType);
+
+  useEffect(() => {
+    if (userType === "Buyer") {
+      setSidebarItems(buyerItems);
+    } else {
+      setSidebarItems(farmersItems);
+    }
+  }, [userType]);
   return (
     <>
       {/* Mobile Overlay */}
