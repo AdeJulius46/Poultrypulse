@@ -260,6 +260,8 @@ export default function LoginStepper() {
       setShowConnectButton(false);
 
       if (userType == "Buyer") {
+        router.push("/marketplace");
+      } else if (userType == "Farmer") {
         router.push("/dashboard");
       }
 
