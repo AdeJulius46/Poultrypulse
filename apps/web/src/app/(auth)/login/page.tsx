@@ -1,21 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useStore } from "@/lib/store";
+import { Loader2 } from "lucide-react";
 // import { useToast } from '@/components/ui/use-toast';
 
 export default function LoginPage() {
   const router = useRouter();
   // const { toast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const setUserType = useStore((state) => state.setUserType);

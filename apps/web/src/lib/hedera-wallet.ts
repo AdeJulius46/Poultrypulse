@@ -3,8 +3,6 @@ import {
   PrivateKey,
   AccountCreateTransaction,
   Hbar,
-  AccountId,
-  TransferTransaction,
   ContractExecuteTransaction,
   ContractFunctionParameters,
   AccountBalanceQuery,
