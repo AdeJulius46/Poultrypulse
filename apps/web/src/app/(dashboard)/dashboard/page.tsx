@@ -1,10 +1,9 @@
 "use client";
 
-import { Details } from "./details/page";
-import { ActionButtonsSection } from "./ActionButtonsSection.tsx/page";
-import { PredictionsSection } from "./PredictionsSection .tsx/page";
-import { RecommendationsSection } from "./RecommendationsSection.tsx/page";
+import { ActionButtonsSection } from "@/components/ActionButtonSection";
 import DashboardHeader from "@/components/layout/dashboardHeader";
+import { Details } from "@/components/details";
+import { RecommendationsSection } from "@/components/recommendationSection";
 
 export default function DashboardPage() {
   return (

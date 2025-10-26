@@ -15,7 +15,7 @@ import {
   pptcontractAbi,
   tokenAbi,
   tokenContract,
-} from "../../../../contract";
+} from "../contract";
 import { useEffect, useState } from "react";
 
 export const Details = () => {
@@ -87,7 +87,7 @@ export const Details = () => {
   const withdrawTokens = () => {
     try {
       const tokenBalance = balance || 0;
-      if (tokenBalance <= 0) {
+      if (tokenBalance != 0) {
         alert("No tokens available to withdraw");
         return;
       }

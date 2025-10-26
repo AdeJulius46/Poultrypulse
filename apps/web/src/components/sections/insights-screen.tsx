@@ -4,22 +4,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ChartContainer } from "@/components/ui/chart";
-import { 
-  Plus, 
-  Bell, 
-  Heart, 
-  Fan, 
-  ArrowUpDown, 
+import {
+  Plus,
+  Bell,
+  Heart,
+  Fan,
+  ArrowUpDown,
   CloudRain,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
+import DashboardHeader from "../layout/dashboardHeader";
 
 // Wrapper component to handle the video display without batch selection
 const VideoDisplay = ({ selectedBatch }: { selectedBatch: string }) => {
   return (
-    <div className="relative bg-gray-900 rounded-2xl overflow-hidden shadow-lg" style={{ aspectRatio: '16/9' }}>
+    <div
+      className="relative bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
+      style={{ aspectRatio: "16/9" }}
+    >
       {/* Batch indicator */}
       <div className="absolute top-6 right-6 z-20 bg-black/70 text-white px-3 py-2 rounded-md">
         <span className="text-sm font-medium">Batch {selectedBatch}</span>
@@ -27,27 +31,40 @@ const VideoDisplay = ({ selectedBatch }: { selectedBatch: string }) => {
 
       {/* Video content */}
       <video
-        src={selectedBatch === "A" ? "vid1.mp4" : selectedBatch === "B" ? "http://172.20.10.10:8080/?action=stream" : "vid2.mp4"}
+        src={
+          selectedBatch === "A"
+            ? "vid1.mp4"
+            : selectedBatch === "B"
+            ? "http://172.20.10.10:8080/?action=stream"
+            : "vid2.mp4"
+        }
         className="w-full h-full object-cover"
         controls
         autoPlay
         muted
         loop
       >
-        <source src={selectedBatch === "A" ? "vid1.mp4" : selectedBatch === "B" ? "http://172.20.10.10:8080/?action=stream" : "vid2.mp4"} type="video/mp4" />
+        <source
+          src={
+            selectedBatch === "A"
+              ? "vid1.mp4"
+              : selectedBatch === "B"
+              ? "http://172.20.10.10:8080/?action=stream"
+              : "vid2.mp4"
+          }
+          type="video/mp4"
+        />
         Your browser does not support the video tag.
       </video>
 
       {/* Stream info overlay */}
       <div className="absolute bottom-6 left-6 bg-black/70 text-white px-4 py-2 rounded-lg">
         <div className="text-sm font-medium">
-          {selectedBatch === "B" ? 'Live Feed' : 'Recorded Video'} • Batch {selectedBatch}
+          {selectedBatch === "B" ? "Live Feed" : "Recorded Video"} • Batch{" "}
+          {selectedBatch}
         </div>
         <div className="text-xs opacity-75 mt-1">
-          {selectedBatch === "B" 
-            ? 'Live Stream'
-            : 'Poultry Farm Recording'
-          }
+          {selectedBatch === "B" ? "Live Stream" : "Poultry Farm Recording"}
         </div>
       </div>
     </div>
@@ -77,55 +94,9 @@ export function InsightsScreen() {
   };
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen">
+    <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Insights and Analysis</h1>
-          <div className="flex items-center space-x-4">
-            <Button size="icon" className="bg-green-600 hover:bg-green-700">
-              <Plus className="w-5 h-5 text-white" />
-            </Button>
-            <Button variant="outline" className="flex items-center space-x-2">
-              <span className="w-4 h-4">🦊</span>
-              <span>Connect Wallet</span>
-            </Button>
-            <Avatar>
-              <AvatarImage src="/avatar.png" />
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-            <Button size="icon" variant="ghost" className="relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Batch Selection */}
-        <div className="mt-4 flex space-x-2">
-          <Button 
-            onClick={() => handleBatchSelect("A")}
-            className={selectedBatch === "A" ? "bg-green-600 text-white hover:bg-green-700" : "bg-white text-green-600 hover:bg-green-50 border border-green-600"}
-          >
-            Batch A
-          </Button>
-          <Button 
-            onClick={() => handleBatchSelect("B")}
-            variant="outline"
-            className={selectedBatch === "B" ? "bg-green-600 text-white hover:bg-green-700 border-green-600" : ""}
-          >
-            Batch B
-          </Button>
-          <Button 
-            onClick={() => handleBatchSelect("C")}
-            variant="outline"
-            className={selectedBatch === "C" ? "bg-green-600 text-white hover:bg-green-700 border-green-600" : ""}
-          >
-            Batch C
-          </Button>
-          <Button variant="ghost">See more batches</Button>
-        </div>
-      </div>
+      <DashboardHeader text={"Insight"} />
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
@@ -144,12 +115,16 @@ export function InsightsScreen() {
                   <div className="w-32 h-32 mx-auto mb-4 relative">
                     <div className="w-full h-full rounded-full bg-green-100 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-green-600">91%</div>
+                        <div className="text-3xl font-bold text-green-600">
+                          91%
+                        </div>
                         <div className="text-sm text-gray-500">out of 100</div>
                       </div>
                     </div>
                   </div>
-                  <p className="text-lg font-semibold text-green-600">Excellent</p>
+                  <p className="text-lg font-semibold text-green-600">
+                    Excellent
+                  </p>
                 </div>
 
                 <div className="mt-6 space-y-4">
@@ -159,7 +134,10 @@ export function InsightsScreen() {
                       <span>89%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{ width: "89%" }}></div>
+                      <div
+                        className="bg-green-500 h-2 rounded-full"
+                        style={{ width: "89%" }}
+                      ></div>
                     </div>
                   </div>
                   <div>
@@ -168,7 +146,10 @@ export function InsightsScreen() {
                       <span>75%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{ width: "75%" }}></div>
+                      <div
+                        className="bg-green-500 h-2 rounded-full"
+                        style={{ width: "75%" }}
+                      ></div>
                     </div>
                   </div>
                   <div>
@@ -177,7 +158,10 @@ export function InsightsScreen() {
                       <span>92%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{ width: "92%" }}></div>
+                      <div
+                        className="bg-green-500 h-2 rounded-full"
+                        style={{ width: "92%" }}
+                      ></div>
                     </div>
                   </div>
                   <div>
@@ -186,7 +170,10 @@ export function InsightsScreen() {
                       <span>63%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{ width: "63%" }}></div>
+                      <div
+                        className="bg-green-500 h-2 rounded-full"
+                        style={{ width: "63%" }}
+                      ></div>
                     </div>
                   </div>
                 </div>
@@ -216,9 +203,12 @@ export function InsightsScreen() {
                   <Fan className="w-6 h-6 text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-2">Optimize Ventilation</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    Optimize Ventilation
+                  </h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Open ventilation for 15 minutes per hour during peak heat (11 AM - 4 PM).
+                    Open ventilation for 15 minutes per hour during peak heat
+                    (11 AM - 4 PM).
                   </p>
                 </div>
               </div>
@@ -232,9 +222,12 @@ export function InsightsScreen() {
                   <ArrowUpDown className="w-6 h-6 text-orange-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-2">Adjust Feed Spacing</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    Adjust Feed Spacing
+                  </h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Increase feed spacing to reduce crowding and improve distribution.
+                    Increase feed spacing to reduce crowding and improve
+                    distribution.
                   </p>
                 </div>
               </div>
@@ -248,9 +241,12 @@ export function InsightsScreen() {
                   <CloudRain className="w-6 h-6 text-cyan-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-2">Cooling System</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    Cooling System
+                  </h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Introduce misting or cooling pads to stabilize climate conditions.
+                    Introduce misting or cooling pads to stabilize climate
+                    conditions.
                   </p>
                 </div>
               </div>
@@ -281,14 +277,18 @@ export function InsightsScreen() {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between">
-                  <ToggleGroup type="single" defaultValue="24h" className="grid grid-cols-4">
+                  <ToggleGroup
+                    type="single"
+                    defaultValue="24h"
+                    className="grid grid-cols-4"
+                  >
                     <ToggleGroupItem value="1h">1h</ToggleGroupItem>
                     <ToggleGroupItem value="6h">6h</ToggleGroupItem>
                     <ToggleGroupItem value="12h">12h</ToggleGroupItem>
                     <ToggleGroupItem value="24h">24h</ToggleGroupItem>
                   </ToggleGroup>
                 </div>
-                
+
                 <div className="h-64">
                   <ChartContainer config={chartConfig} className="h-full">
                     <div className="text-center text-gray-500 py-20">
@@ -319,7 +319,9 @@ export function InsightsScreen() {
                     <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
                     <span className="font-medium">At Risk</span>
                   </div>
-                  <span className="text-2xl font-bold text-orange-600">13.3%</span>
+                  <span className="text-2xl font-bold text-orange-600">
+                    13.3%
+                  </span>
                 </div>
                 <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg">
                   <div className="flex items-center space-x-3">
