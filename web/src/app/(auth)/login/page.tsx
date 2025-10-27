@@ -17,6 +17,8 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const setUserType = useStore((state) => state.setUserType);
   const userType = useStore((state) => state.userType);
+  const profile = useStore((state) => state.profile);
+  const setProfile = useStore((state) => state.setProfile);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -38,14 +40,13 @@ export default function LoginPage() {
         // Successful login
         const { data: profileData, error } = await supabase
           .from("profiles")
-          .select("usertype")
-          .eq("id", data.user.id)
-          .single();
+          .select("*");
         if (error) {
           if (error instanceof Error) alert(error.message);
         } else if (profileData) {
           console.log("Profile Data:", profileData);
-          if (profileData.usertype === "Buyer") {
+          setProfile(profileData as any);
+          if (profileData[0].usertype === "Buyer") {
             setUserType("Buyer");
             router.push("/marketplace"); // or wherever you want to redirect
           } else {

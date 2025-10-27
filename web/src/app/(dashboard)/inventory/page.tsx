@@ -1,8 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Plus, Wallet, User, Bell, Check, X, Loader2 } from "lucide-react";
 import DashboardHeader from "@/components/layout/dashboardHeader";
 import { supabase } from "@/lib/supabase";
+import { ContractFunctionParameters } from "@hashgraph/sdk";
+import { HederaWalletService } from "@/lib/hedera-wallet";
+import { useStore } from "@/lib/store";
+import { market_id } from "@/contract";
 
 type LivestockType = "chicken" | "turkey" | null;
 type HealthStatus = "healthy" | "vaccinated" | "organic";
@@ -26,6 +30,8 @@ const FarmersInventory = () => {
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
 
+  const profile = useStore((state) => state.profile);
+
   const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -40,6 +46,13 @@ const FarmersInventory = () => {
   const getFileType = (file: File): "image" | "video" => {
     return file.type.startsWith("image/") ? "image" : "video";
   };
+
+  const BreedOption = [
+    { id: "1", breed: "Broilers" },
+    { id: "2", breed: "Turkeys" },
+    { id: "3", breed: "Layers" },
+    { id: "4", breed: "Eggs" },
+  ];
 
   const recentUploads: RecentUpload[] = [
     { id: "1", breed: "Broilers", lastChecked: "" },
@@ -122,10 +135,12 @@ const FarmersInventory = () => {
         description: description || null,
         media_urls: mediaUrls,
         status: "published",
+        product_contract_id: "1",
       });
 
       if (dbError) throw dbError;
 
+      addToContract(mediaUrls[0]);
       alert("Inventory added successfully!");
       handleCancel(); // reset form
     } catch (error: unknown) {
@@ -140,6 +155,71 @@ const FarmersInventory = () => {
       setUploading(false);
     }
   };
+
+  const addToContract = useCallback(
+    async (images: string) => {
+      try {
+        const walletService = new HederaWalletService("testnet");
+        const index = BreedOption.find((obj) => obj.breed == breedType);
+        const _breedType = Number(index?.id);
+
+        // Convert image URL string to bytes32 hash
+        // Option 1: Use a simple hash of the URL
+        const hashBuffer = new TextEncoder().encode(images);
+        const hashArray = new Uint8Array(32); // bytes32 needs exactly 32 bytes
+        hashArray.set(hashBuffer.slice(0, 32)); // Take first 32 bytes or pad with zeros
+
+        // Option 2: If you have ethers.js available, use keccak256
+        // import { ethers } from 'ethers';
+        // const healthCertHash = ethers.utils.id(images); // Creates keccak256 hash
+        // const healthCertBytes = ethers.utils.arrayify(healthCertHash);
+
+        const contractParams = new ContractFunctionParameters()
+          .addUint8(_breedType) // ✅ productType (1-4)
+          .addUint256(Number(quantity)) // ✅ quantity
+          .addUint256(Number(price)) // ✅ pricePerUnit
+          .addUint256(2) // ✅ minimumOrder
+          .addBytes32(hashArray) // ✅ healthCertHash
+          .addBytes32(hashArray) // ✅ iotDataHash
+          .addString("Location") // ✅ farmLocation
+          .addUint256(20); // ✅ durationDays
+
+        const params = profile[0];
+
+        // Validate required fields
+        if (!params?.hedera_wallet) {
+          alert("Hedera wallet address not found");
+          return;
+        }
+        if (!params?.hedera_account_id) {
+          alert("Hedera account ID not found");
+          return;
+        }
+        if (!params?.hedera_private_key_encrypted) {
+          alert("Hedera private key not found");
+          return;
+        }
+
+        const receipt = await walletService.executeContract(
+          params.hedera_account_id,
+          params.hedera_private_key_encrypted,
+          market_id,
+          "createListing",
+          contractParams,
+          700000
+        );
+
+        console.log("Listing successful Receipt", receipt);
+        alert("Listing successful");
+      } catch (error) {
+        if (error instanceof Error) {
+          alert(error.message);
+          console.log(error.message);
+        }
+      }
+    },
+    [breedType, quantity, price, profile]
+  );
 
   return (
     <div className="min-h-screen max-w-7xl mx-auto lg:px-6 px-2 bg-gray-50">
@@ -222,10 +302,17 @@ const FarmersInventory = () => {
                     onChange={(e) => setBreedType(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent sm:text-sm"
                   >
-                    <option value="">Select Breed Type</option>
+                    {/* <option value="">Select Breed Type</option>
                     <option value="broiler">Broiler</option>
                     <option value="rhode-island">Rhode Island</option>
-                    <option value="leghorn">Leghorn</option>
+                    <option value="turkey">Turkey</option> */}
+                    {BreedOption.map((breed) => {
+                      return (
+                        <option value={breed.breed} id={breed.id}>
+                          {breed.breed}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
                 <div>

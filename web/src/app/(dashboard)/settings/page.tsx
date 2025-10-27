@@ -1,5 +1,7 @@
 "use client";
+import DashboardHeader from "@/components/layout/dashboardHeader";
 import { Button } from "@/components/ui/button";
+import { useStore } from "@/lib/store";
 import { supabase } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,6 +15,8 @@ export default function SettingsPage() {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signOut();
+
+      useStore.getState().clearAll();
       if (!error) router.push("/login");
     } catch (error: any) {
       alert(error.message);
@@ -21,10 +25,9 @@ export default function SettingsPage() {
     }
   };
   return (
-    <div className="container py-6">
-      <h1 className="text-2xl font-bold">Settings</h1>
+    <div className="max-w-7xl mx-auto p-6">
       {/* Add your dashboard content here */}
-
+      <DashboardHeader text={"Settings"} />
       {/* Sign Out Button */}
       <Button
         className="w-full sm:w-auto cursor-pointer bg-green-600 hover:bg-green-700 

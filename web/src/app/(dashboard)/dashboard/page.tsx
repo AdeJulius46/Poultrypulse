@@ -14,7 +14,7 @@ export default function DashboardPage() {
         {/* Left Column - Token Balance & Video Feed */}
 
         <div className="flex flex-col sm:gap-6 gap-6 w-full lg:px-3 lg:w-[60%] ">
-          <Details />
+          {/* <Details /> */}
           <ActionButtonsSection />
         </div>
 

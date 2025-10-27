@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { HumidityCard, TemperatureCard } from "./temperature";
 
 interface Batch {
   id: string;
@@ -106,6 +107,21 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
     setStreamError(true);
   };
 
+  const temperatureData = {
+    temperature: 29,
+    status: "Warning" as const,
+    range: "18-30",
+    source: "Batch A",
+  };
+
+  const humidityData = {
+    humidityData: [
+      65, 72, 68, 75, 70, 78, 73, 69, 71, 74, 68, 72, 70, 67, 71, 69,
+    ],
+    status: "Warning" as const,
+    range: "18-30",
+    source: "Batch A",
+  };
   useEffect(() => {
     if (streamError && activeBatch.isLiveStream && imgRef.current) {
       const timer = setTimeout(() => {
@@ -297,6 +313,11 @@ export const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({
               : "Poultry Farm Recording"}
           </div>
         </div>
+      </div>
+
+      <div className="space-y-4 mt-4">
+        <TemperatureCard {...temperatureData} />
+        <HumidityCard {...humidityData} />
       </div>
     </div>
   );

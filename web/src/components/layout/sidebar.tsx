@@ -13,6 +13,7 @@ import {
   X,
   ShoppingBasket,
   ShoppingCart,
+  Package,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useEffect, useState } from "react";
@@ -48,7 +49,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
   useEffect(() => {
     if (userType === "Buyer") {
       setSidebarItems(buyerItems);
-    } else {
+    } else if (userType === "Farmer") {
       setSidebarItems(farmersItems);
     }
   }, [userType]);

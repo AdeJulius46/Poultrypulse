@@ -290,7 +290,7 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         bytes32 _iotDataHash,
         string memory _farmLocation,
         uint256 _durationDays
-    ) external onlyRole(VERIFIED_FARMER_ROLE) whenNotPaused returns (uint256) {
+    ) external whenNotPaused returns (uint256) {
         require(_quantity > 0, "Quantity must be positive");
         require(_pricePerUnit > 0, "Price must be positive");
         require(
@@ -385,7 +385,11 @@ contract PoultryMarketplace is AccessControl, ReentrancyGuard, Pausable {
         emit OrderStatusChanged(_orderId, OrderStatus.Confirmed);
 
         // Notify supply chain contract to start tracking
-        ISupplyChain(supplyChainContract).initiateTracking(_orderId, order.farmer, order.buyer);
+        ISupplyChain(supplyChainContract).initiateTracking(
+            _orderId,
+            order.farmer,
+            order.buyer
+        );
     }
 
     /**
