@@ -6,6 +6,7 @@ import {
   Camera,
   Clock,
   TrendingUp,
+  X,
 } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { fetchChickenMonitoring, ChickenMonitoring } from "../lib/supabase";
@@ -32,6 +33,9 @@ interface FlockSummary {
 
 export const RecommendationsSection = () => {
   const [detectionImages, setDetectionImages] = useState<DetectionData[]>([]);
+  const [selectedImage, setSelectedImage] = useState<DetectionData | null>(
+    null
+  );
   const [flockSummary, setFlockSummary] = useState<FlockSummary>({
     totalHealthy: 0,
     totalAtRisk: 0,
@@ -301,13 +305,16 @@ export const RecommendationsSection = () => {
               >
                 <CardContent className="p-2 sm:p-3 h-full">
                   <div className="flex items-center h-full gap-2 sm:gap-3">
-                    <div className="relative w-16 h-16 sm:w-[70px] sm:h-[70px] rounded-lg sm:rounded-xl overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
+                    <div
+                      className="relative w-16 h-16 sm:w-[70px] sm:h-[70px] rounded-lg sm:rounded-xl overflow-hidden border-2 border-white shadow-sm flex-shrink-0 cursor-pointer"
+                      onClick={() => setSelectedImage(detection)}
+                    >
                       <img
                         src={detection.image_url}
                         alt={`${getDiseaseDisplayName(
                           detection.disease
                         )} Detection`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
                             "/placeholder-chicken.jpg";
@@ -388,6 +395,88 @@ export const RecommendationsSection = () => {
           </div>
         </CardContent>
       </Card>
+
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div
+            className="relative max-w-4xl w-full max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg transition-colors"
+            >
+              <X className="w-6 h-6 text-gray-800" />
+            </button>
+
+            {/* Image */}
+            <div className="w-full max-h-[60vh] overflow-hidden bg-gray-100">
+              <img
+                src={selectedImage.image_url}
+                alt={`${getDiseaseDisplayName(
+                  selectedImage.disease
+                )} Detection`}
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "/placeholder-chicken.jpg";
+                }}
+              />
+            </div>
+
+            {/* Details */}
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-gray-900">
+                  {getDiseaseDisplayName(selectedImage.disease)}
+                </h2>
+                <div
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    selectedImage.risk_level === "CRITICAL"
+                      ? "bg-red-100 text-red-800"
+                      : selectedImage.risk_level === "HIGH"
+                      ? "bg-orange-100 text-orange-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}
+                >
+                  {selectedImage.risk_level}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Confidence:</span>
+                  <span className="ml-2 font-semibold text-gray-900">
+                    {Math.round(selectedImage.confidence * 100)}%
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Temperature:</span>
+                  <span className="ml-2 font-semibold text-gray-900">
+                    {selectedImage.temperature.toFixed(1)}°C
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Humidity:</span>
+                  <span className="ml-2 font-semibold text-gray-900">
+                    {selectedImage.humidity.toFixed(1)}%
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Detected:</span>
+                  <span className="ml-2 font-semibold text-gray-900">
+                    {formatTimestamp(selectedImage.timestamp)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -182,13 +182,13 @@ export class HederaWalletService {
   /**
    * Get token balance for an address (ERC20 balanceOf)
    */
-  async getTokenBalance(contractId: string, address: string): Promise<string> {
+  async getTokenBalance(contractId: string): Promise<string> {
     try {
-      const params = new ContractFunctionParameters().addAddress(address);
+      const params = new ContractFunctionParameters();
 
       const response = await this.callContract(
         contractId,
-        "balanceOf",
+        "balanceOfSender",
         params,
         50000
       );

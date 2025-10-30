@@ -14,6 +14,7 @@ import {
   ShoppingBasket,
   ShoppingCart,
   Package,
+  Box,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useEffect, useState } from "react";
@@ -39,6 +40,7 @@ export function Sidebar({ className, isOpen, onToggle }: SidebarProps) {
     { icon: ShoppingBasket, href: "/marketplace", label: "Marketplace" },
     { icon: Calendar, href: "/wallet", label: "Wallet" },
     { icon: ShoppingCart, href: "/cart", label: "Cart" },
+    { icon: Box, href: "/orders", label: "Orders" },
     { icon: BarChart, href: "/settings", label: "Settings" },
   ];
 

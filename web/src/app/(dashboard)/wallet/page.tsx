@@ -84,9 +84,9 @@ export default function WalletPage() {
       console.log("Account ID:", params.hedera_account_id);
 
       // Build contract parameters
-      const contractParams = new ContractFunctionParameters()
-        .addAddress(params.hedera_wallet)
-        .addUint256(Number(amount));
+      const contractParams = new ContractFunctionParameters().addUint256(
+        Number(amount)
+      );
 
       // Execute the contract
       const walletService = new HederaWalletService("testnet");
@@ -100,7 +100,7 @@ export default function WalletPage() {
         params.hedera_account_id,
         privateKey,
         token_contract_id,
-        "mint",
+        "mitToSender",
         contractParams,
         200000 // Gas limit
         //1 // Payable amount in HBAR (adjust based on your needs)
@@ -132,10 +132,19 @@ export default function WalletPage() {
 
       const walletService = new HederaWalletService("testnet");
       const _tokenBalance = await walletService.getTokenBalance(
-        token_contract_id,
-        profile[0]?.hedera_wallet
+        token_contract_id
       );
 
+      // const contractParams = new ContractFunctionParameters();
+      // const response = await walletService.executeContract(
+      //   profile[0]?.hedera_account_id,
+      //   profile[0]?.hedera_private_key_encrypted,
+      //   token_contract_id,
+      //   "balanceOfSender",
+      //   contractParams,
+      //   200000
+      // );
+      // console.log(response);
       console.log("Token Balance:", tokenBalance);
       setTokenBalance(_tokenBalance);
     } catch (error) {

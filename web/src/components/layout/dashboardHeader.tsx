@@ -26,10 +26,10 @@ const DashboardHeader: React.FC<Headerprops> = ({ text }) => {
           <button className="hidden bg-green-600 hover:bg-green-700 text-white w-10 h-10 rounded-full lg:flex items-center justify-center transition-colors">
             <Plus size={20} />
           </button>
-          <button className="hidden bg-white border-2 border-gray-200 hover:border-gray-300 px-6 py-2 rounded-full font-medium transition-colors lg:flex items-center gap-2">
+          {/* <button className="hidden bg-white border-2 border-gray-200 hover:border-gray-300 px-6 py-2 rounded-full font-medium transition-colors lg:flex items-center gap-2">
             <ShoppingCart size={18} className="text-orange-500" />
             <span className="text-sm">Connect Wallet</span>
-          </button>
+          </button> */}
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-pink-400 flex items-center justify-center">
             <User size={20} className="text-white" />
           </div>
